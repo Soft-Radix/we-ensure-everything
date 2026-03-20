@@ -181,7 +181,7 @@ SELECT c.id, p.code, p.name, p.sort_order FROM categories c
 JOIN (
   SELECT 'COMMERCIAL' AS cat, 'BOP'      AS code, 'Business Owners Policy (BOP)'             AS name, 1  AS sort_order UNION ALL
   SELECT 'COMMERCIAL', 'GL',         'General Liability',                                             2  UNION ALL
-  SELECT 'COMMERCIAL', 'WC',         "Workers' Compensation",                                         3  UNION ALL
+  SELECT 'COMMERCIAL', 'WC',         'Workers\' Compensation',                                         3  UNION ALL
   SELECT 'COMMERCIAL', 'COMM_AUTO',  'Commercial Auto',                                               4  UNION ALL
   SELECT 'COMMERCIAL', 'PROP',       'Commercial Property',                                            5  UNION ALL
   SELECT 'COMMERCIAL', 'CYBER',      'Cyber Liability',                                               6  UNION ALL
