@@ -88,7 +88,7 @@ const UserDetailsStep = ({
             {/* Dropdown */}
             {counties.length > 0 && !selectedCounty && (
               <div className="mt-2 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden max-h-60 overflow-y-auto">
-                {counties.map((c) => (
+                {counties.map((c: any) => (
                   <button
                     key={c.id}
                     onClick={() => {
@@ -120,7 +120,7 @@ const UserDetailsStep = ({
               Specific Product
             </h3>
             <div className="grid grid-cols-1 gap-3 max-h-64 overflow-y-auto pr-2">
-              {products.map((p) => (
+              {products.map((p: any) => (
                 <button
                   key={p.code}
                   onClick={() => setSelectedProduct(p)}
