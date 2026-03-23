@@ -1,17 +1,13 @@
 import Link from "next/link";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 
 export default function AgentPortalPage() {
   return (
     <div className="min-h-screen bg-slate-50">
-      <Header />
-
       <div className="bg-gradient-to-br from-[#0D5A8A] to-[#1378B2] text-white py-14">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h1
             className="text-3xl md:text-4xl font-black mb-3"
-            style={{ fontFamily: "Montserrat, sans-serif" }}
+            //
           >
             AgentPro! Portal
           </h1>
@@ -52,12 +48,7 @@ export default function AgentPortalPage() {
             >
               <div className="text-3xl mb-4">{c.icon}</div>
               <div className="flex items-start justify-between gap-2 mb-2">
-                <h3
-                  className="font-bold text-slate-900"
-                  style={{ fontFamily: "Montserrat, sans-serif" }}
-                >
-                  {c.title}
-                </h3>
+                <h3 className="font-bold text-slate-900">{c.title}</h3>
                 {c.badge && (
                   <span
                     className={`text-xs font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${c.color === "emerald" ? "bg-emerald-100 text-emerald-700" : c.color === "blue" ? "bg-blue-100 text-blue-700" : "bg-amber-100 text-amber-700"}`}
@@ -74,10 +65,7 @@ export default function AgentPortalPage() {
         {/* Coming soon notice */}
         <div className="bg-white rounded-3xl p-12 shadow-sm border border-slate-200 text-center">
           <div className="text-5xl mb-6">🏗️</div>
-          <h2
-            className="font-black text-2xl text-slate-900 mb-3"
-            style={{ fontFamily: "Montserrat, sans-serif" }}
-          >
+          <h2 className="font-black text-2xl text-slate-900 mb-3">
             Agent Portal Coming Soon
           </h2>
           <p className="text-slate-500 text-lg max-w-md mx-auto mb-8">
@@ -88,22 +76,18 @@ export default function AgentPortalPage() {
             <Link
               href="/find-agent"
               className="bg-[#1378B2] hover:bg-[#0D5A8A] text-white font-bold px-8 py-4 rounded-full no-underline transition-all"
-              style={{ fontFamily: "Montserrat, sans-serif" }}
             >
               Test Consumer Flow
             </Link>
             <Link
               href="/"
               className="border-2 border-[#1378B2] text-[#1378B2] hover:bg-[#E8F4FD] font-bold px-8 py-4 rounded-full no-underline transition-all"
-              style={{ fontFamily: "Montserrat, sans-serif" }}
             >
               Back to Home
             </Link>
           </div>
         </div>
       </div>
-
-      <Footer />
     </div>
   );
 }

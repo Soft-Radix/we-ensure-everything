@@ -16,8 +16,11 @@ export default function Header() {
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
       <div className="max-w-6xl mx-auto px-6 flex items-center justify-between h-16">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 no-underline group">
-          <Image src="/icons/header.png" alt="Logo" width={180} height={180} />
+        <Link href="/" className="flex flex-col no-underline group">
+          <Image src="/icons/header.png" alt="Logo" width={160} height={160} />
+          <span className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.2em] -mt-1 ml-0.5">
+            A Nationwide Insurance Marketplace
+          </span>
         </Link>
 
         {/* Desktop Nav */}
@@ -26,17 +29,16 @@ export default function Header() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-slate-600 hover:text-[#1378B2] font-medium text-sm transition-colors no-underline"
+              className="text-slate-600 hover:text-brand-navy font-semibold text-sm transition-colors no-underline"
             >
               {link.label}
             </Link>
           ))}
           <Link
             href="/find-agent"
-            className="bg-[#1378B2] hover:bg-[#0D5A8A] text-white font-bold text-sm px-5 py-2.5 rounded-full no-underline transition-all hover:-translate-y-0.5 shadow-md hover:shadow-lg"
-            style={{ fontFamily: "Montserrat, sans-serif" }}
+            className="bg-brand-navy hover:bg-slate-800 text-white font-bold text-sm px-6 py-2.5 rounded-full no-underline transition-all hover:-translate-y-0.5 shadow-md hover:shadow-lg border border-white/10"
           >
-            Find an Agent →
+            Find an Agent
           </Link>
         </nav>
 
@@ -47,13 +49,13 @@ export default function Header() {
           aria-label="Toggle menu"
         >
           <span
-            className={`block w-6 h-0.5 bg-[#1378B2] rounded transition-all duration-300 ${menuOpen ? "rotate-45 translate-y-2" : ""}`}
+            className={`block w-6 h-0.5 bg-brand-navy rounded transition-all duration-300 ${menuOpen ? "rotate-45 translate-y-2" : ""}`}
           />
           <span
-            className={`block w-6 h-0.5 bg-[#1378B2] rounded transition-all duration-300 ${menuOpen ? "opacity-0" : ""}`}
+            className={`block w-6 h-0.5 bg-brand-navy rounded transition-all duration-300 ${menuOpen ? "opacity-0" : ""}`}
           />
           <span
-            className={`block w-6 h-0.5 bg-[#1378B2] rounded transition-all duration-300 ${menuOpen ? "-rotate-45 -translate-y-2" : ""}`}
+            className={`block w-6 h-0.5 bg-brand-navy rounded transition-all duration-300 ${menuOpen ? "-rotate-45 -translate-y-2" : ""}`}
           />
         </button>
       </div>
@@ -66,7 +68,7 @@ export default function Header() {
               key={link.href}
               href={link.href}
               onClick={() => setMenuOpen(false)}
-              className="text-slate-600 hover:text-[#1378B2] font-medium text-base no-underline py-2 border-b border-slate-50"
+              className="text-slate-600 hover:text-brand-navy font-medium text-base no-underline py-2 border-b border-slate-50"
             >
               {link.label}
             </Link>
@@ -74,10 +76,9 @@ export default function Header() {
           <Link
             href="/find-agent"
             onClick={() => setMenuOpen(false)}
-            className="bg-[#1378B2] text-white font-bold text-sm px-5 py-3 rounded-full no-underline text-center mt-2"
-            style={{ fontFamily: "Montserrat, sans-serif" }}
+            className="bg-brand-navy text-white font-bold text-sm px-5 py-3 rounded-full no-underline text-center mt-2"
           >
-            Get a Quote →
+            Find an Agent
           </Link>
         </div>
       )}
