@@ -19,37 +19,40 @@ const quickLinks = [
 
 export default function Footer() {
   return (
-    <footer className="bg-[#0D5A8A] text-white pt-16 pb-8">
+    <footer className="bg-brand-navy text-white pt-20 pb-10">
       <div className="max-w-6xl mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-12 border-b border-white/15">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-16 border-b border-white/10">
           {/* Brand */}
-          <div>
-            <Image
-              src="/icons/header.png"
-              alt="Logo"
-              width={200}
-              height={200}
-            />
-            <p className="text-white/70 text-sm leading-relaxed max-w-xs">
-              A nationwide network of exclusive, licensed insurance specialists
-              — one agent per county, per coverage.
+          <div className="space-y-6">
+            <Link href="/" className="flex flex-col no-underline group">
+              <Image
+                src="/icons/header.png"
+                alt="Logo"
+                width={180}
+                height={180}
+                className=""
+              />
+              <span className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.2em] mt-1 ml-0.5">
+                A Nationwide Insurance Marketplace
+              </span>
+            </Link>
+            <p className="text-white/60 text-sm leading-relaxed">
+              Connecting consumers with licensed, vetted insurance agents across
+              all 3,143 U.S. counties.
             </p>
           </div>
 
           {/* Coverage */}
           <div>
-            <h4
-              className="font-bold text-xs uppercase tracking-widest text-white/40 mb-5"
-              style={{ fontFamily: "Montserrat, sans-serif" }}
-            >
+            <h4 className="font-bold text-xs uppercase tracking-widest text-brand-gold mb-6">
               Coverage Types
             </h4>
-            <ul className="space-y-2.5">
+            <ul className="space-y-3">
               {categories.map((c) => (
                 <li key={c.name}>
                   <Link
                     href={c.href}
-                    className="text-white/75 hover:text-[#F67B13] text-sm no-underline transition-colors"
+                    className="text-white/70 hover:text-brand-gold text-sm no-underline transition-colors"
                   >
                     {c.name}
                   </Link>
@@ -60,18 +63,15 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4
-              className="font-bold text-xs uppercase tracking-widest text-white/40 mb-5"
-              style={{ fontFamily: "Montserrat, sans-serif" }}
-            >
+            <h4 className="font-bold text-xs uppercase tracking-widest text-brand-gold mb-6">
               Quick Links
             </h4>
-            <ul className="space-y-2.5">
+            <ul className="space-y-3">
               {quickLinks.map((l) => (
                 <li key={l.name}>
                   <Link
                     href={l.href}
-                    className="text-white/75 hover:text-[#F67B13] text-sm no-underline transition-colors"
+                    className="text-white/70 hover:text-brand-gold text-sm no-underline transition-colors"
                   >
                     {l.name}
                   </Link>
@@ -80,36 +80,41 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* CTA */}
+          {/* Trust & Compliance */}
           <div>
-            <h4
-              className="font-bold text-xs uppercase tracking-widest text-white/40 mb-5"
-              style={{ fontFamily: "Montserrat, sans-serif" }}
-            >
-              Find Your Agent
+            <h4 className="font-bold text-xs uppercase tracking-widest text-brand-gold mb-6">
+              Trust & Compliance
             </h4>
-            <p className="text-white/70 text-sm leading-relaxed mb-5">
-              Search by county to find a licensed specialist dedicated
-              exclusively to your area.
+            <p className="text-white/60 text-[11px] leading-relaxed mb-4">
+              We Insure Everything is a marketing platform connecting consumers
+              with licensed insurance agents. We are not an insurance carrier.
             </p>
-            <Link
-              href="/find-agent"
-              className="inline-flex items-center gap-2 bg-[#F67B13] hover:bg-[#D96608] text-white font-bold text-sm px-6 py-3 rounded-full no-underline transition-colors"
-              style={{ fontFamily: "Montserrat, sans-serif" }}
-            >
-              Find My Agent →
-            </Link>
+            <p className="text-white/60 text-[11px] leading-relaxed mb-4">
+              Agents are licensed in their respective states. Coverage matches
+              are provided by third-party licensed professionals and carriers.
+            </p>
+            <div className="flex gap-4 items-center opacity-50">
+              <span className="text-2xl">🔒</span>
+              <span className="text-2xl">🛡️</span>
+              <span className="text-2xl">🇺🇸</span>
+            </div>
           </div>
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-6 flex flex-col sm:flex-row justify-between items-center gap-3">
-          <p className="text-white/40 text-xs">
-            © {new Date().getFullYear()} WeInsureEverything.com · Powered by
-            AgentPro! &amp; ReferralPro!
-          </p>
-          <p className="text-white/30 text-xs">
-            Built by SoftRadix Technologies Pvt. Ltd.
+        <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex flex-col gap-1">
+            <p className="text-white/40 text-[10px] uppercase tracking-wider">
+              © {new Date().getFullYear()} We Insure Everything · A Nationwide
+              Insurance Marketplace
+            </p>
+            <p className="text-white/30 text-[10px]">
+              Availability varies by state. All trademarks are the property of
+              their respective owners.
+            </p>
+          </div>
+          <p className="text-white/20 text-[10px]">
+            Powered by AgentPro! & ReferralPro!
           </p>
         </div>
       </div>

@@ -1,357 +1,232 @@
 import Link from "next/link";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 
-const categories = [
-  {
-    code: "COMMERCIAL",
-    icon: "🏢",
-    name: "Commercial Insurance",
-    desc: "General liability, BOP, cyber, workers comp & more",
-  },
-  {
-    code: "HEALTH",
-    icon: "🏥",
-    name: "Health, Life & Disability",
-    desc: "Individual health, life, disability, LTC & annuities",
-  },
-  {
-    code: "PERSONAL",
-    icon: "🏠",
-    name: "Personal Insurance",
-    desc: "Auto, home, renters, umbrella & flood coverage",
-  },
-  {
-    code: "MEDICARE",
-    icon: "👴",
-    name: "Medicare & Senior",
-    desc: "Medicare supplement, advantage, Part D & final expense",
-  },
-  {
-    code: "FINANCIAL",
-    icon: "📊",
-    name: "Financial & Legal",
-    desc: "IUL, annuities, wealth management & legal expense",
-  },
-  {
-    code: "GROUP",
-    icon: "👥",
-    name: "Group Benefits",
-    desc: "Group health, dental, 401k & employee benefits",
-  },
-];
-
-const steps = [
-  {
-    step: "01",
-    title: "Select Your County",
-    desc: "Search from all 3,143 U.S. counties to find your exact coverage area.",
-  },
-  {
-    step: "02",
-    title: "Choose Coverage Type",
-    desc: "Pick from 6 insurance categories and the specific product you need.",
-  },
-  {
-    step: "03",
-    title: "Get Your Agent",
-    desc: "We instantly match you to the exclusive licensed agent in your county.",
-  },
-];
-
-const stats = [
-  { value: "3,143", label: "U.S. Counties Covered" },
-  { value: "6", label: "Insurance Categories" },
-  { value: "60+", label: "Products Available" },
-  { value: "1", label: "Exclusive Agent Per County" },
-];
+import Image from "next/image";
+import { categories, steps, trustPoints } from "@/lib/data/static";
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-white">
-      <Header />
-
       {/* ── HERO ─────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#0D5A8A] via-[#1378B2] to-[#1A8FD1] text-white">
-        {/* Decorative circles */}
-        <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-white/5" />
-        <div className="absolute -bottom-20 -left-20 w-80 h-80 rounded-full bg-white/5" />
-        <div className="absolute top-1/2 right-1/4 w-48 h-48 rounded-full bg-[#F67B13]/10" />
+      <section className="relative overflow-hidden bg-brand-navy text-white">
+        {/* Background elements */}
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-linear-to-l from-brand-gold/10 to-transparent pointer-events-none" />
+        <div className="absolute -bottom-48 -left-48 w-96 h-96 rounded-full bg-brand-gold/5 blur-3xl pointer-events-none" />
 
-        <div className="relative max-w-6xl mx-auto px-6 py-24 md:py-32">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur px-4 py-2 rounded-full text-sm font-semibold mb-6 border border-white/20">
-              <span className="w-2 h-2 bg-[#3FCF40] rounded-full animate-pulse" />
-              AgentPro! Powered Platform
+        <div className="relative max-w-6xl mx-auto px-6 py-28 md:py-40">
+          <div className="max-w-4xl">
+            <div className="inline-flex items-center gap-3 bg-white/5 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10 mb-8">
+              <span className="flex h-2 w-2 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-gold opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-gold"></span>
+              </span>
+              <span className="text-xs font-bold uppercase tracking-widest text-brand-gold">
+                A National Insurance Marketplace
+              </span>
             </div>
 
-            <h1
-              className="text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6"
-              style={{ fontFamily: "Montserrat, sans-serif" }}
-            >
-              Your Insurance Journey{" "}
-              <span className="text-[#F67B13]">Starts Here.</span>
+            <h1 className="text-5xl md:text-7xl font-heading font-black leading-[1.1] mb-8">
+              Insurance Coverage. <br />
+              <span className="text-brand-gold italic">
+                Matched to You.
+              </span>{" "}
+              <br />
+              Anywhere in the U.S.
             </h1>
 
-            <p className="text-lg md:text-xl text-white/85 leading-relaxed mb-10 max-w-2xl">
-              We match you with <strong>one exclusive, licensed agent</strong>{" "}
-              in your county — dedicated to your coverage, guaranteed. No
-              generic calls. No runaround. Just your agent.
+            <p className="text-xl md:text-2xl text-white/70 leading-relaxed mb-12 max-w-2xl font-light">
+              We connect you with licensed, vetted insurance agents based on
+              your location, needs, and coverage type — so you get the right
+              policy, not just a quote.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-5">
               <Link
                 href="/find-agent"
-                className="inline-flex items-center justify-center gap-2 bg-[#F67B13] hover:bg-[#D96608] text-white font-black text-base px-8 py-4 rounded-full no-underline transition-all hover:-translate-y-1 shadow-xl hover:shadow-2xl"
-                style={{ fontFamily: "Montserrat, sans-serif" }}
+                className="inline-flex items-center justify-center gap-2 bg-brand-gold hover:bg-brand-gold-dark text-brand-navy font-black text-lg px-10 py-5 rounded-full no-underline transition-all hover:-translate-y-1 shadow-2xl"
               >
-                🔍 Find My Agent Now
+                Get Matched in 60 Seconds
               </Link>
               <Link
-                href="#how-it-works"
-                className="inline-flex items-center justify-center gap-2 bg-white/15 hover:bg-white/25 border border-white/30 text-white font-bold text-base px-8 py-4 rounded-full no-underline transition-all"
-                style={{ fontFamily: "Montserrat, sans-serif" }}
+                href="#categories"
+                className="inline-flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/20 text-white font-bold text-lg px-8 py-5 rounded-full no-underline transition-all"
               >
-                See How It Works
+                Browse Coverage Options
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── STATS BAR ─────────────────────────────────────────── */}
-      <section className="bg-white border-b border-slate-100">
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-            {stats.map((s) => (
-              <div key={s.label} className="text-center">
-                <div
-                  className="text-3xl md:text-4xl font-black text-[#1378B2]"
-                  style={{ fontFamily: "Montserrat, sans-serif" }}
-                >
-                  {s.value}
+      {/* ── COVERAGE GRID ───────────────────────────────────── */}
+      <section id="categories" className="py-24 md:py-32 bg-white">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+            <div className="max-w-2xl">
+              <span className="inline-block text-brand-gold font-bold text-sm uppercase tracking-[0.2em] mb-4">
+                Full Spectrum Protection
+              </span>
+              <h2 className="text-4xl md:text-5xl font-heading font-black text-brand-navy">
+                What would you like to insure today?
+              </h2>
+            </div>
+            <p className="text-slate-500 text-lg max-w-sm">
+              From personal assets to business liabilities, we have a licensed
+              specialist ready to help.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {categories.map((cat) => (
+              <Link
+                key={cat.code}
+                href={`/find-agent?category=${cat.code}`}
+                className="group p-8 bg-slate-50 border border-slate-100 hover:border-brand-gold/30 rounded-3xl no-underline transition-all hover:shadow-2xl hover:-translate-y-2 relative overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 w-24 h-24 bg-brand-gold/5 rounded-bl-full translate-x-4 -translate-y-4 group-hover:scale-150 transition-transform duration-500" />
+                {/* <div className="text-5xl mb-6 relative z-10">{cat.icon}</div> */}
+                <Image
+                  src={cat.icon}
+                  alt={cat.name}
+                  width={64}
+                  height={64}
+                  className="w-16 h-16 mb-6 relative z-10"
+                />
+                <div className="relative z-10">
+                  <h3 className="font-heading font-bold text-2xl text-brand-navy mb-3 group-hover:text-brand-gold transition-colors">
+                    {cat.name}
+                  </h3>
+                  <p className="text-slate-500 leading-relaxed mb-6">
+                    {cat.desc}
+                  </p>
+                  <div className="flex items-center gap-2 text-brand-navy font-black text-sm uppercase tracking-wider">
+                    Get Matched
+                    <span className="transform group-hover:translate-x-2 transition-transform">
+                      →
+                    </span>
+                  </div>
                 </div>
-                <div className="text-sm text-slate-500 font-medium mt-1">
-                  {s.label}
-                </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
       {/* ── HOW IT WORKS ─────────────────────────────────────── */}
-      <section id="how-it-works" className="py-20 md:py-28 bg-slate-50">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <span className="inline-block text-[#1378B2] font-bold text-sm uppercase tracking-widest mb-3">
-              Simple Process
+      <section
+        id="how-it-works"
+        className="py-24 md:py-32 bg-brand-navy text-white relative overflow-hidden"
+      >
+        <div className="absolute top-1/2 left-0 w-96 h-96 bg-brand-gold/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+
+        <div className="max-w-6xl mx-auto px-6 relative z-10">
+          <div className="text-center mb-20">
+            <span className="inline-block text-brand-gold font-bold text-sm uppercase tracking-[0.2em] mb-4">
+              Our Process
             </span>
-            <h2
-              className="text-3xl md:text-4xl font-black text-slate-900 mb-4"
-              style={{ fontFamily: "Montserrat, sans-serif" }}
-            >
+            <h2 className="text-4xl md:text-5xl font-heading font-black mb-6">
               How It Works
             </h2>
-            <p className="text-slate-500 text-lg max-w-xl mx-auto">
-              Three steps to find your dedicated insurance specialist — takes
-              less than a minute.
-            </p>
+            <div className="w-20 h-1 bg-brand-gold mx-auto" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             {steps.map((s, i) => (
-              <div
-                key={s.step}
-                className="relative bg-white rounded-2xl p-8 shadow-sm border border-slate-200 hover:shadow-md hover:-translate-y-1 transition-all duration-200"
-              >
-                {i < steps.length - 1 && (
-                  <div className="hidden md:block absolute top-10 -right-4 w-8 h-0.5 bg-[#1378B2]/30 z-10" />
-                )}
-                <div
-                  className="w-12 h-12 rounded-xl bg-[#E8F4FD] flex items-center justify-center font-black text-[#1378B2] text-lg mb-5"
-                  style={{ fontFamily: "Montserrat, sans-serif" }}
-                >
-                  {s.step}
+              <div key={s.step} className="text-center space-y-6">
+                <div className="relative inline-block">
+                  <div className="w-20 h-20 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center font-heading font-black text-3xl text-brand-gold mx-auto rotate-3 group-hover:rotate-0 transition-transform">
+                    {s.step}
+                  </div>
+                  {i < steps.length - 1 && (
+                    <div className="hidden md:block absolute top-10 left-[120%] w-24 h-px bg-linear-to-r from-brand-gold/50 to-transparent" />
+                  )}
                 </div>
-                <h3
-                  className="font-bold text-lg text-slate-900 mb-3"
-                  style={{ fontFamily: "Montserrat, sans-serif" }}
-                >
-                  {s.title}
-                </h3>
-                <p className="text-slate-500 text-sm leading-relaxed">
+                <h3 className="text-2xl font-heading font-bold">{s.title}</h3>
+                <p className="text-white/60 leading-relaxed max-w-xs mx-auto">
                   {s.desc}
                 </p>
               </div>
             ))}
           </div>
-
-          <div className="text-center mt-12">
-            <Link
-              href="/find-agent"
-              className="inline-flex items-center gap-2 bg-[#1378B2] hover:bg-[#0D5A8A] text-white font-bold px-8 py-4 rounded-full no-underline transition-all hover:-translate-y-0.5 shadow-md"
-              style={{ fontFamily: "Montserrat, sans-serif" }}
-            >
-              Start Your Search →
-            </Link>
-          </div>
         </div>
       </section>
 
-      {/* ── CATEGORIES ───────────────────────────────────────── */}
-      <section id="categories" className="py-20 md:py-28 bg-white">
+      {/* ── WHY TRUST US ─────────────────────────────────────── */}
+      <section className="py-24 md:py-32 bg-slate-50">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <span className="inline-block text-[#1378B2] font-bold text-sm uppercase tracking-widest mb-3">
-              All Coverage Types
-            </span>
-            <h2
-              className="text-3xl md:text-4xl font-black text-slate-900 mb-4"
-              style={{ fontFamily: "Montserrat, sans-serif" }}
-            >
-              What Would You Like to Insure?
-            </h2>
-            <p className="text-slate-500 text-lg max-w-xl mx-auto">
-              Choose a category and we&apos;ll connect you with your
-              county&apos;s exclusive specialist.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categories.map((cat) => (
-              <Link
-                key={cat.code}
-                href={`/find-agent?category=${cat.code}`}
-                className="group flex flex-col gap-4 p-7 bg-white border-2 border-slate-200 hover:border-[#1378B2] rounded-2xl no-underline transition-all hover:shadow-lg hover:-translate-y-1"
-              >
-                <div className="text-4xl">{cat.icon}</div>
-                <div>
-                  <h3
-                    className="font-bold text-base text-slate-900 mb-1.5 group-hover:text-[#1378B2] transition-colors"
-                    style={{ fontFamily: "Montserrat, sans-serif" }}
-                  >
-                    {cat.name}
-                  </h3>
-                  <p className="text-slate-500 text-sm leading-relaxed">
-                    {cat.desc}
-                  </p>
-                </div>
-                <div className="mt-auto flex items-center gap-2 text-[#1378B2] font-semibold text-sm">
-                  Find Agent{" "}
-                  <span className="group-hover:translate-x-1 transition-transform">
-                    →
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── EXCLUSIVITY SECTION ───────────────────────────────── */}
-      <section
-        id="about"
-        className="py-20 md:py-28 bg-gradient-to-br from-[#0D5A8A] to-[#1378B2] text-white"
-      >
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div>
-              <span className="inline-block text-[#F67B13] font-bold text-sm uppercase tracking-widest mb-3">
-                BNI-Style Exclusivity
+              <span className="inline-block text-brand-gold font-bold text-sm uppercase tracking-[0.2em] mb-4">
+                The Standard for Trust
               </span>
-              <h2
-                className="text-3xl md:text-4xl font-black leading-tight mb-6"
-                style={{ fontFamily: "Montserrat, sans-serif" }}
-              >
-                One Agent. One County. Your Coverage.
+              <h2 className="text-4xl md:text-5xl font-heading font-black text-brand-navy mb-8 leading-tight">
+                Why thousands of Americans trust our marketplace.
               </h2>
-              <p className="text-white/80 text-lg leading-relaxed mb-8">
-                Every county × every insurance category × every product has
-                exactly <strong>one</strong> dedicated, licensed agent. No
-                competition. No confusion. Just accountability and commitment to
-                your needs.
+              <p className="text-slate-600 text-lg leading-relaxed mb-10">
+                In an industry full of generic call centers and confusing
+                quotes, we prioritize local expertise and state-licensed
+                professional matching.
               </p>
-              <ul className="space-y-4">
-                {[
-                  "Exclusive territory — no competing agents in your county",
-                  "Licensed specialists per coverage type",
-                  "Instant routing — matched in under 2 seconds",
-                  "Nationwide coverage across all 3,143 U.S. counties",
-                ].map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-start gap-3 text-white/85 text-base"
-                  >
-                    <span className="w-5 h-5 rounded-full bg-[#3FCF40] flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-bold">
-                      ✓
-                    </span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
 
-            <div className="bg-white/10 backdrop-blur rounded-3xl p-10 border border-white/20">
-              <h3
-                className="font-black text-2xl mb-8 text-center"
-                style={{ fontFamily: "Montserrat, sans-serif" }}
-              >
-                Ready to Find Your Agent?
-              </h3>
-              <div className="space-y-4 mb-8">
-                {[
-                  { label: "Select your county", done: false },
-                  { label: "Choose insurance type", done: false },
-                  { label: "Pick your product", done: false },
-                  { label: "Meet your agent!", done: false },
-                ].map((item, i) => (
-                  <div key={item.label} className="flex items-center gap-4">
-                    <div className="w-8 h-8 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center font-bold text-sm flex-shrink-0">
-                      {i + 1}
-                    </div>
-                    <span className="text-white/85 text-sm">{item.label}</span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                {trustPoints.map((tp) => (
+                  <div key={tp.title} className="flex flex-col gap-3">
+                    <span className="text-3xl">{tp.icon}</span>
+                    <h4 className="font-heading font-bold text-brand-navy text-xl">
+                      {tp.title}
+                    </h4>
+                    <p className="text-slate-500 text-sm leading-relaxed">
+                      {tp.desc}
+                    </p>
                   </div>
                 ))}
               </div>
-              <Link
-                href="/find-agent"
-                className="block text-center bg-[#F67B13] hover:bg-[#D96608] text-white font-black py-4 px-6 rounded-2xl no-underline transition-all hover:-translate-y-0.5 shadow-lg"
-                style={{ fontFamily: "Montserrat, sans-serif" }}
-              >
-                🔍 Find My Agent Now
-              </Link>
+            </div>
+
+            <div className="relative">
+              <div className="absolute -inset-4 bg-brand-gold/10 rounded-[3rem] rotate-2" />
+              <div className="relative bg-white p-12 rounded-[2.5rem] shadow-2xl border border-slate-100">
+                <div className="space-y-8">
+                  <div className="flex items-center gap-4 border-b border-slate-100 pb-8">
+                    <div className="w-16 h-16 bg-brand-navy rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                      FL
+                    </div>
+                    <div>
+                      <div className="font-heading font-bold text-brand-navy text-xl">
+                        Expanding Nationwide
+                      </div>
+                      <div className="text-slate-400 text-sm italic">
+                        &quot;Serving clients across Florida and beyond&quot;
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <blockquote className="text-slate-600 italic leading-relaxed">
+                      &quot;I was tired of getting 20 calls from different
+                      agents. Here I was matched with one specialist who
+                      actually knew my county&apos;s specific requirements.
+                      Highly recommend.&quot;
+                    </blockquote>
+                    <div className="flex items-center gap-3">
+                      <div className="flex text-brand-gold">★★★★★</div>
+                      <span className="font-bold text-brand-navy">
+                        — Sarah Jenkins, Homeowner
+                      </span>
+                    </div>
+                  </div>
+
+                  <Link
+                    href="/find-agent"
+                    className="block text-center bg-brand-navy hover:bg-slate-800 text-white font-black py-4 rounded-2xl no-underline transition-all shadow-xl hover:shadow-2xl"
+                  >
+                    Start Your Search Now
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
-
-      {/* ── TRUST BADGES ─────────────────────────────────────── */}
-      <section className="py-14 bg-slate-50 border-t border-slate-200">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex flex-wrap justify-center items-center gap-10 md:gap-16">
-            {[
-              { icon: "🔒", label: "Secure & Private" },
-              { icon: "⚡", label: "Instant Matching" },
-              { icon: "🏅", label: "Licensed Agents Only" },
-              { icon: "🗺️", label: "All 50 U.S. States" },
-              { icon: "🤝", label: "No Obligation" },
-            ].map((b) => (
-              <div
-                key={b.label}
-                className="flex flex-col items-center gap-2 text-center"
-              >
-                <span className="text-3xl">{b.icon}</span>
-                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                  {b.label}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <Footer />
     </div>
   );
 }

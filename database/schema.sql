@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS categories (
   code        VARCHAR(30)  NOT NULL UNIQUE,
   name        VARCHAR(100) NOT NULL,
   description TEXT,
-  icon        VARCHAR(10),
+  icon        VARCHAR(255),
   sort_order  TINYINT UNSIGNED DEFAULT 0,
   active      BOOLEAN DEFAULT TRUE,
   created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -166,12 +166,12 @@ CREATE TABLE IF NOT EXISTS routing_logs (
 -- 9. SEED: Categories
 -- ─────────────────────────────────────────────
 INSERT IGNORE INTO categories (code, name, description, icon, sort_order) VALUES
-  ('COMMERCIAL', 'Commercial Insurance',   'Comprehensive coverage for businesses of all sizes',      '🏢', 1),
-  ('HEALTH',     'Health, Life & Disability','Individual and group health, life, and disability',     '🏥', 2),
-  ('PERSONAL',   'Personal Insurance',     'Auto, home, and personal lines coverage',                '🏠', 3),
-  ('MEDICARE',   'Medicare & Senior',      'Medicare supplements and senior care solutions',          '👴', 4),
-  ('FINANCIAL',  'Financial & Legal',      'Financial protection and legal expense coverage',         '📊', 5),
-  ('GROUP',      'Group Benefits',         'Employee benefits and group administration',              '👥', 6);
+  ('COMMERCIAL', 'Commercial Insurance',   'Comprehensive coverage for businesses of all sizes',      '/icons/commercial.png', 1),
+  ('HEALTH',     'Health, Life & Disability','Individual and group health, life, and disability',     '/icons/health.png',     2),
+  ('PERSONAL',   'Personal Insurance',     'Auto, home, and personal lines coverage',                '/icons/personal.png',   3),
+  ('MEDICARE',   'Medicare & Senior',      'Medicare supplements and senior care solutions',          '/icons/senior.png',     4),
+  ('FINANCIAL',  'Financial & Legal',      'Financial protection and legal expense coverage',         '/icons/legal.png',      5),
+  ('GROUP',      'Group Benefits',         'Employee benefits and group administration',              '/icons/group.png',      6);
 
 -- ─────────────────────────────────────────────
 -- 10. SEED: Products

@@ -11,13 +11,13 @@ export interface Category {
   description: string;
   products: Product[];
 }
-
+export type Step = 1 | 2 | 3;
 export const CATEGORIES: Category[] = [
   {
     id: 1,
     code: "COMMERCIAL",
     name: "Commercial Insurance",
-    icon: "🏢",
+    icon: "/icons/commercial.png",
     description: "Comprehensive coverage for businesses of all sizes",
     products: [
       { code: "BOP", name: "Business Owners Policy (BOP)" },
@@ -37,7 +37,7 @@ export const CATEGORIES: Category[] = [
     id: 2,
     code: "HEALTH",
     name: "Health, Life & Disability",
-    icon: "🏥",
+    icon: "/icons/health.png",
     description: "Individual and group health, life, and disability solutions",
     products: [
       { code: "IND_HEALTH", name: "Individual Health" },
@@ -59,7 +59,7 @@ export const CATEGORIES: Category[] = [
     id: 3,
     code: "PERSONAL",
     name: "Personal Insurance",
-    icon: "🏠",
+    icon: "/icons/personal.png",
     description: "Auto, home, and personal lines coverage",
     products: [
       { code: "HOME", name: "Homeowners Insurance" },
@@ -78,7 +78,7 @@ export const CATEGORIES: Category[] = [
     id: 4,
     code: "MEDICARE",
     name: "Medicare & Senior",
-    icon: "👴",
+    icon: "/icons/senior.png",
     description: "Medicare supplements and senior care solutions",
     products: [
       { code: "MED_SUPP", name: "Medicare Supplement (Medigap)" },
@@ -95,7 +95,7 @@ export const CATEGORIES: Category[] = [
     id: 5,
     code: "FINANCIAL",
     name: "Financial & Legal",
-    icon: "📊",
+    icon: "/icons/legal.png",
     description: "Financial protection and legal expense coverage",
     products: [
       { code: "IUL", name: "Indexed Universal Life (IUL)" },
@@ -113,7 +113,7 @@ export const CATEGORIES: Category[] = [
     id: 6,
     code: "GROUP",
     name: "Group Benefits",
-    icon: "👥",
+    icon: "/icons/group.png",
     description: "Employee benefits and group administration",
     products: [
       { code: "GROUP_HEALTH", name: "Group Health Insurance" },

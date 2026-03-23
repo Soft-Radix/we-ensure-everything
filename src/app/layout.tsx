@@ -1,18 +1,20 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "WeInsureEverything.com | Find Your Local Insurance Specialist",
+  title: "We Insure Everything | Nationwide Insurance Marketplace",
   description:
-    "Find a licensed, exclusive insurance agent in your county for commercial, health, personal, medicare, financial, and group insurance. AgentPro! powered by WeInsureEverything.",
+    "A national insurance marketplace connecting you with licensed, vetted local agents. Find the right coverage based on your location and needs.",
   keywords:
-    "insurance agent, local insurance, county insurance specialist, commercial insurance, health insurance, medicare, personal insurance",
+    "insurance marketplace, nationwide insurance, local insurance agents, car insurance, health insurance, home insurance, medicare specialists",
   openGraph: {
-    title: "WeInsureEverything.com | Find Your Local Insurance Specialist",
+    title: "We Insure Everything | Nationwide Insurance Marketplace",
     description:
-      "Connect with your exclusive local insurance agent. One agent. Your county. Every coverage.",
+      "Connect with licensed, vetted insurance agents based on your location and needs. Nationwide reach with local expertise.",
     url: "https://weinsureeverything.com",
-    siteName: "WeInsureEverything.com",
+    siteName: "We Insure Everything",
     type: "website",
   },
   twitter: { card: "summary_large_image" },
@@ -34,7 +36,11 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <Header />
+        {children}
+        <Footer />
+      </body>
     </html>
   );
 }
