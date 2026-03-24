@@ -18,11 +18,15 @@ const AgentResultStep = ({ routingResult, setStep }: any) => {
 
           <div className="bg-slate-50 rounded-[2.5rem] p-10 border border-slate-100 flex flex-col items-center">
             <div className="w-32 h-32 bg-brand-navy rounded-full flex items-center justify-center text-white text-4xl font-black mb-6 shadow-xl border-4 border-white">
-              {routingResult.agent.firstName[0]}
-              {routingResult.agent.lastName[0]}
+              {routingResult.agent.fullName
+                ?.split(" ")
+                .map((n: string) => n[0])
+                .join("")
+                .toUpperCase()
+                .slice(0, 2)}
             </div>
             <h3 className="text-3xl font-heading font-black text-brand-navy mb-2">
-              {routingResult.agent.firstName} {routingResult.agent.lastName}
+              {routingResult.agent.fullName}
             </h3>
             <div className="px-4 py-1 bg-brand-gold/20 text-brand-gold-dark rounded-full text-xs font-black uppercase tracking-widest mb-6">
               Exclusive Licensed Agent

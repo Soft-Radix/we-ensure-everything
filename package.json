@@ -3,12 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "seed:counties": "node database/seed-counties.js",
-    "db:schema": "mysql -u admin -padmin123 < database/schema.sql"
+    "db:schema": "mysql -u admin -padmin123 < database/schema.sql",
+    "db:migrate": "sequelize-cli db:migrate",
+    "db:migrate:undo": "sequelize-cli db:migrate:undo",
+    "db:seed": "sequelize-cli db:seed:all"
   },
   "dependencies": {
     "@types/uuid": "^10.0.0",
@@ -17,6 +20,8 @@
     "next": "16.1.7",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "sequelize": "^6.37.8",
+    "sequelize-cli": "^6.6.5",
     "uuid": "^13.0.0",
     "yup": "^1.7.1"
   },

@@ -20,8 +20,7 @@ export interface Product {
 }
 export interface Agent {
   id: number;
-  firstName: string;
-  lastName: string;
+  fullName: string;
   email: string;
   phone: string;
   photoUrl?: string;

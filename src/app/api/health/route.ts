@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import pool from "@/lib/db";
+import { sequelize } from "@/models";
 
 export async function GET() {
   try {
-    await pool.query("SELECT 1");
+    await sequelize.authenticate();
     return NextResponse.json({
       status: "ok",
       db: "connected",

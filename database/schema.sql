@@ -55,10 +55,13 @@ CREATE TABLE IF NOT EXISTS products (
 CREATE TABLE IF NOT EXISTS agents (
   id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   ghl_user_id  VARCHAR(100) UNIQUE COMMENT 'GoHighLevel User ID',
-  first_name   VARCHAR(100) NOT NULL,
-  last_name    VARCHAR(100) NOT NULL,
+  full_name   VARCHAR(255) NOT NULL,
   email        VARCHAR(255) NOT NULL UNIQUE,
-  phone        VARCHAR(30),
+  phone        VARCHAR(30) NOT NULL UNIQUE,
+  state_abbr   CHAR(2) NOT NULL,
+  county       VARCHAR(100) NOT NULL,
+  category     VARCHAR(100) NOT NULL,
+  product      VARCHAR(100) NOT NULL,
   license_no   VARCHAR(100),
   license_state CHAR(2),
   bio          TEXT,
@@ -243,17 +246,17 @@ JOIN (
 -- ─────────────────────────────────────────────
 -- 11. SEED: Agents
 -- ─────────────────────────────────────────────
-INSERT IGNORE INTO agents (ghl_user_id, first_name, last_name, email, phone, license_no, license_state, bio, status) VALUES
-  ('user_101', 'John', 'Doe', 'john.doe@agentpro.com', '(555) 123-4567', 'LIC-98765', 'CA', 'Commercial insurance specialist with 15+ years of experience helping businesses mitigate risk.', 'active'),
-  ('user_102', 'Jane', 'Smith', 'jane.smith@agentpro.com', '(555) 234-5678', 'LIC-87654', 'NY', 'Dedicated to providing comprehensive health and life insurance solutions for families and individuals.', 'active'),
-  ('user_103', 'Robert', 'Johnson', 'robert.j@agentpro.com', '(555) 345-6789', 'LIC-76543', 'TX', 'Expert in personal lines, ensuring your home and auto are protected with the best coverage options.', 'active'),
-  ('user_104', 'Emily', 'Brown', 'emily.brown@agentpro.com', '(555) 456-7890', 'LIC-65432', 'FL', 'Specializing in Medicare Advantage and Supplement plans for over a decade.', 'active'),
-  ('user_105', 'Michael', 'Wilson', 'm.wilson@agentpro.com', '(555) 567-8901', 'LIC-54321', 'IL', 'Helping clients navigate complex financial and legal protection strategies.', 'active'),
-  ('user_110', 'Sarah', 'Davis', 'sarah.davis@agentpro.com', '(555) 678-9012', 'LIC-43210', 'GA', 'Group benefits expert focusing on employee retention through superior benefits packages.', 'active'),
-  ('user_111', 'David', 'Garcia', 'dave.garcia@agentpro.com', '(555) 789-0123', 'LIC-32109', 'AZ', 'Passionate about finding the right auto and property solutions for my community.', 'active'),
-  ('user_112', 'Jessica', 'Martinez', 'jessica.m@agentpro.com', '(555) 890-1234', 'LIC-21098', 'WA', 'Focused on luxury home and specialized umbrella policies for high-net-worth clients.', 'active'),
-  ('user_109', 'William', 'Anderson', 'william.a@agentpro.com', '(555) 901-2345', 'LIC-10987', 'OH', 'Providing peace of mind through tailored life and long-term care insurance.', 'active'),
-  ('user_113', 'Ashley', 'Taylor', 'ashley.t@agentpro.com', '(555) 012-3456', 'LIC-09876', 'NC', 'Expert in business owners policies and general liability for startups.', 'active');
+INSERT IGNORE INTO agents (ghl_user_id, full_name, email, phone, license_no, license_state, bio, status) VALUES
+  ('user_101', 'John Doe', 'john.doe@agentpro.com', '(555) 123-4567', 'LIC-98765', 'CA', 'Commercial insurance specialist with 15+ years of experience helping businesses mitigate risk.', 'active'),
+  ('user_102', 'Jane Smith', 'jane.smith@agentpro.com', '(555) 234-5678', 'LIC-87654', 'NY', 'Dedicated to providing comprehensive health and life insurance solutions for families and individuals.', 'active'),
+  ('user_103', 'Robert Johnson', 'robert.j@agentpro.com', '(555) 345-6789', 'LIC-76543', 'TX', 'Expert in personal lines, ensuring your home and auto are protected with the best coverage options.', 'active'),
+  ('user_104', 'Emily Brown', 'emily.brown@agentpro.com', '(555) 456-7890', 'LIC-65432', 'FL', 'Specializing in Medicare Advantage and Supplement plans for over a decade.', 'active'),
+  ('user_105', 'Michael Wilson', 'm.wilson@agentpro.com', '(555) 567-8901', 'LIC-54321', 'IL', 'Helping clients navigate complex financial and legal protection strategies.', 'active'),
+  ('user_110', 'Sarah Davis', 'sarah.davis@agentpro.com', '(555) 678-9012', 'LIC-43210', 'GA', 'Group benefits expert focusing on employee retention through superior benefits packages.', 'active'),
+  ('user_111', 'David Garcia', 'dave.garcia@agentpro.com', '(555) 789-0123', 'LIC-32109', 'AZ', 'Passionate about finding the right auto and property solutions for my community.', 'active'),
+  ('user_112', 'Jessica Martinez', 'jessica.m@agentpro.com', '(555) 890-1234', 'LIC-21098', 'WA', 'Focused on luxury home and specialized umbrella policies for high-net-worth clients.', 'active'),
+  ('user_109', 'William Anderson', 'william.a@agentpro.com', '(555) 901-2345', 'LIC-10987', 'OH', 'Providing peace of mind through tailored life and long-term care insurance.', 'active'),
+  ('user_113', 'Ashley Taylor', 'ashley.t@agentpro.com', '(555) 012-3456', 'LIC-09876', 'NC', 'Expert in business owners policies and general liability for startups.', 'active');
 
 -- ─────────────────────────────────────────────
 -- 12. SEED: Initial Seats (Exclusives)
