@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import pool from "@/lib/db";
+import { Op } from "sequelize";
+import { County } from "@/models";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -8,22 +9,26 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(parseInt(searchParams.get("limit") || "50"), 100);
 
   try {
-    const params: (string | number)[] = [];
-    let sql = `SELECT id, fips_code, name, state, state_abbr FROM counties WHERE 1=1`;
+    const where: Record<string, unknown> = {};
 
     if (q) {
-      sql += ` AND name LIKE ?`;
-      params.push(`%${q}%`);
+      where.name = { [Op.like]: `%${q}%` };
     }
     if (state) {
-      sql += ` AND state_abbr = ?`;
-      params.push(state.toUpperCase());
+      where.state_abbr = state.toUpperCase();
     }
-    sql += ` ORDER BY state_abbr, name LIMIT ?`;
-    params.push(limit);
 
-    const [rows] = await pool.query(sql, params);
-    return NextResponse.json({ counties: rows });
+    const counties = await County.findAll({
+      where,
+      attributes: ["id", "fips_code", "name", "state", "state_abbr"],
+      order: [
+        ["state_abbr", "ASC"],
+        ["name", "ASC"],
+      ],
+      limit,
+    });
+
+    return NextResponse.json({ counties });
   } catch (err) {
     console.error("[API /counties] DB error:", err);
     return NextResponse.json(

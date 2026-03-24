@@ -2,6 +2,14 @@ import { Step } from "@/lib/data/categories";
 import Image from "next/image";
 import React from "react";
 
+const imagesArray = [
+  "/icons/commercial.png",
+  "/icons/health.png",
+  "/icons/personal.png",
+  "/icons/senior.png",
+  "/icons/legal.png",
+  "/icons/group.png",
+];
 const CoverageStep = ({
   setSelectedCategory,
   setStep,
@@ -28,7 +36,7 @@ const CoverageStep = ({
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {categories.map((cat) => (
+          {categories.map((cat, index) => (
             <button
               key={cat.code}
               onClick={() => {
@@ -38,11 +46,11 @@ const CoverageStep = ({
               className="group flex flex-col items-center gap-4 p-8 text-center border-2 border-slate-100 rounded-3xl hover:border-brand-gold hover:bg-slate-50 transition-all duration-300 hover:-translate-y-1"
             >
               <div className="relative w-16 h-16 group-hover:scale-110 transition-transform">
-                <Image
-                  src={cat.icon}
+                <img
+                  src={imagesArray[index % imagesArray.length]}
                   alt={cat.name}
-                  width={64}
-                  height={64}
+                  // width={64}
+                  // height={64}
                   className="w-full h-full object-contain"
                 />
               </div>

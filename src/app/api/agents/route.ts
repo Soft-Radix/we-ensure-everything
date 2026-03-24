@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import pool from "@/lib/db";
+import {
+  sequelize,
+  Agent,
+  Category,
+  Product,
+  County,
+  Seat,
+  Waitlist,
+} from "@/models";
 
 /* ──────────────────────────────────────────────────────────────
    POST /api/agents
@@ -16,6 +24,7 @@ export async function POST(req: NextRequest) {
 
   let body: {
     ghlUserId?: string;
+    fullName?: string;
     firstName?: string;
     lastName?: string;
     email?: string;
@@ -27,8 +36,11 @@ export async function POST(req: NextRequest) {
     productCode?: string;
     bio?: string;
     photoUrl?: string;
+    stateAbbr?: string;
+    countyName?: string;
+    categoryName?: string;
+    productName?: string;
   };
-
   try {
     body = await req.json();
   } catch {
@@ -37,6 +49,7 @@ export async function POST(req: NextRequest) {
 
   const {
     ghlUserId,
+    fullName,
     firstName,
     lastName,
     email,
@@ -48,11 +61,14 @@ export async function POST(req: NextRequest) {
     productCode,
     bio,
     photoUrl,
+    stateAbbr,
+    countyName,
+    categoryName,
+    productName,
   } = body;
 
   if (
-    !firstName ||
-    !lastName ||
+    (!fullName && (!firstName || !lastName)) ||
     !email ||
     !countyId ||
     !categoryCode ||
@@ -61,84 +77,94 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         error:
-          "firstName, lastName, email, countyId, categoryCode, productCode are required",
+          "fullName (or firstName and lastName), email, countyId, categoryCode, productCode are required",
       },
       { status: 400 },
     );
   }
 
-  const conn = await pool.getConnection();
+  const t = await sequelize.transaction();
+
   try {
-    await conn.beginTransaction();
+    const finalFullName =
+      fullName || `${firstName || ""} ${lastName || ""}`.trim();
 
-    // 1. Upsert agent
-    await conn.query<any>(
-      `INSERT INTO agents (ghl_user_id, first_name, last_name, email, phone,
-         license_no, license_state, bio, photo_url, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')
-       ON DUPLICATE KEY UPDATE
-         ghl_user_id = VALUES(ghl_user_id),
-         first_name  = VALUES(first_name),
-         last_name   = VALUES(last_name),
-         phone       = VALUES(phone),
-         license_no  = VALUES(license_no),
-         license_state = VALUES(license_state),
-         bio         = VALUES(bio),
-         photo_url   = VALUES(photo_url),
-         updated_at  = NOW()`,
-      [
-        ghlUserId || null,
-        firstName,
-        lastName,
-        email,
-        phone || null,
-        licenseNo || null,
-        licenseState || null,
-        bio || null,
-        photoUrl || null,
+    if (!finalFullName) {
+      return NextResponse.json({ error: "Name is required" }, { status: 400 });
+    }
+
+    // 1. Resolve records
+    const countyRecord = await County.findByPk(countyId, { transaction: t });
+    const productRecord = await Product.findOne({
+      where: { code: productCode.toUpperCase() },
+      include: [
+        {
+          model: Category,
+          where: { code: categoryCode.toUpperCase() },
+          required: true,
+        },
       ],
-    );
+      transaction: t,
+    });
 
-    // Get agent ID
-    const [agentRows] = await conn.query<any[]>(
-      `SELECT id FROM agents WHERE email = ? LIMIT 1`,
-      [email],
-    );
-    const agentId = agentRows[0].id;
-
-    // 2. Resolve category & product IDs
-    const [catRows] = await conn.query<any[]>(
-      `SELECT c.id AS categoryId, p.id AS productId
-       FROM categories c JOIN products p ON p.category_id = c.id
-       WHERE c.code = ? AND p.code = ? LIMIT 1`,
-      [categoryCode.toUpperCase(), productCode.toUpperCase()],
-    );
-
-    if (catRows.length === 0) {
-      await conn.rollback();
+    if (!countyRecord || !productRecord) {
+      await t.rollback();
       return NextResponse.json(
-        { error: "Invalid category or product" },
+        { error: "Invalid county, category or product" },
         { status: 400 },
       );
     }
-    const { categoryId, productId } = catRows[0];
+
+    const { category_id: categoryId, id: productId } = productRecord;
+    const resolvedStateAbbr = stateAbbr || countyRecord.state_abbr;
+    const resolvedCounty = countyName || countyRecord.name;
+    const resolvedCategory = categoryName || productRecord.Category!.name;
+    const resolvedProduct = productName || productRecord.name;
+
+    // 2. Upsert agent with detailed fields
+    const [agent] = await Agent.upsert(
+      {
+        ghl_user_id: ghlUserId || null,
+        full_name: finalFullName,
+        email,
+        phone: phone || "",
+        state_abbr: resolvedStateAbbr,
+        county: resolvedCounty,
+        category: resolvedCategory,
+        product: resolvedProduct,
+        license_no: licenseNo || null,
+        license_state: licenseState || null,
+        bio: bio || null,
+        photo_url: photoUrl || null,
+        status: "active",
+      },
+      { transaction: t },
+    );
 
     // 3. Check if seat is available
-    const [existingSeat] = await conn.query<any[]>(
-      `SELECT id, agent_id FROM seats
-       WHERE county_id = ? AND category_id = ? AND product_id = ? AND status = 'active'
-       LIMIT 1`,
-      [countyId, categoryId, productId],
-    );
+    const existingSeat = await Seat.findOne({
+      where: {
+        county_id: countyId,
+        category_id: categoryId,
+        product_id: productId,
+        status: "active",
+      },
+      transaction: t,
+    });
 
     let result: { status: string; message: string };
 
-    if (existingSeat.length === 0) {
+    if (!existingSeat) {
       // Seat is free → assign
-      await conn.query(
-        `INSERT INTO seats (county_id, category_id, product_id, agent_id, status)
-         VALUES (?, ?, ?, ?, 'active')`,
-        [countyId, categoryId, productId, agentId],
+      await Seat.create(
+        {
+          county_id: countyId,
+          category_id: categoryId,
+          product_id: productId,
+          agent_id: agent.id,
+          status: "active",
+        },
+        { transaction: t },
       );
       result = {
         status: "assigned",
@@ -146,36 +172,45 @@ export async function POST(req: NextRequest) {
       };
     } else {
       // Seat occupied → waitlist
-      const [wlRows] = await conn.query<any[]>(
-        `SELECT MAX(position) AS maxPos FROM waitlist
-         WHERE county_id = ? AND category_id = ? AND product_id = ? AND status = 'waiting'`,
-        [countyId, categoryId, productId],
-      );
-      const nextPosition = (wlRows[0].maxPos || 0) + 1;
+      const maxPosition = await Waitlist.max<number, Waitlist>("position", {
+        where: {
+          county_id: countyId,
+          category_id: categoryId,
+          product_id: productId,
+          status: "waiting",
+        },
+        transaction: t,
+      });
 
-      await conn.query(
-        `INSERT INTO waitlist (county_id, category_id, product_id, agent_id, position, status)
-         VALUES (?, ?, ?, ?, ?, 'waiting')
-         ON DUPLICATE KEY UPDATE position = VALUES(position), status = 'waiting'`,
-        [countyId, categoryId, productId, agentId, nextPosition],
+      const nextPosition = (maxPosition || 0) + 1;
+
+      await Waitlist.upsert(
+        {
+          county_id: countyId,
+          category_id: categoryId,
+          product_id: productId,
+          agent_id: agent.id,
+          position: nextPosition,
+          status: "waiting",
+        },
+        { transaction: t },
       );
+
       result = {
         status: "waitlisted",
         message: `Seat is occupied. Agent added to waitlist at position ${nextPosition}.`,
       };
     }
 
-    await conn.commit();
-    return NextResponse.json({ ...result, agentId });
+    await t.commit();
+    return NextResponse.json({ ...result, agentId: agent.id });
   } catch (err) {
-    await conn.rollback();
+    if (t) await t.rollback();
     console.error("[API /agents POST] Error:", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
     );
-  } finally {
-    conn.release();
   }
 }
 
@@ -187,24 +222,28 @@ export async function GET(req: NextRequest) {
   const offset = (page - 1) * limit;
 
   try {
-    const [rows] = await pool.query<any[]>(
-      `SELECT a.id, a.first_name, a.last_name, a.email, a.phone,
-              a.license_state, a.status, a.created_at,
-              COUNT(s.id) AS seat_count
-       FROM agents a
-       LEFT JOIN seats s ON s.agent_id = a.id AND s.status = 'active'
-       GROUP BY a.id
-       ORDER BY a.created_at DESC
-       LIMIT ? OFFSET ?`,
-      [limit, offset],
-    );
+    const { count, rows } = await Agent.findAndCountAll({
+      limit,
+      offset,
+      order: [["created_at", "DESC"]],
+      // We can also include seats to get counts, but for simplicity:
+      attributes: {
+        include: [
+          [
+            sequelize.literal(`(
+              SELECT COUNT(*)
+              FROM seats AS s
+              WHERE s.agent_id = Agent.id AND s.status = 'active'
+            )`),
+            "seat_count",
+          ],
+        ],
+      },
+    });
 
-    const [countRows] = await pool.query<any[]>(
-      "SELECT COUNT(*) AS total FROM agents",
-    );
     return NextResponse.json({
       agents: rows,
-      total: countRows[0].total,
+      total: count,
       page,
       limit,
     });

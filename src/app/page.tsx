@@ -34,9 +34,9 @@ export default function HomePage() {
             </h1>
 
             <p className="text-xl md:text-2xl text-white/70 leading-relaxed mb-12 max-w-2xl font-light">
-              We connect you with licensed, vetted insurance agents based on
-              your location, needs, and coverage type — so you get the right
-              policy, not just a quote.
+              Connect with our licensed, vetted insurance agents based on your
+              location, needs, and coverage type so you get the right policy,
+              not just a quote.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-5">

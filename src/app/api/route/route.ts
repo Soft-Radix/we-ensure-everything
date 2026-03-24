@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
     // ── 5. Look up exclusive seat ────────────────────────────────
     const [seatRows] = await conn.query<any[]>(
       `SELECT s.id AS seatId, a.id AS agentId,
-              a.first_name, a.last_name, a.email AS agentEmail,
+              a.full_name, a.email AS agentEmail,
               a.phone AS agentPhone, a.photo_url, a.bio,
               a.website_url, a.ghl_user_id, a.license_state
        FROM seats s
@@ -164,8 +164,7 @@ export async function POST(req: NextRequest) {
         leadId,
         agent: {
           id: agent.agentId,
-          firstName: agent.first_name,
-          lastName: agent.last_name,
+          fullName: agent.full_name,
           email: agent.agentEmail,
           phone: agent.agentPhone,
           photoUrl: agent.photo_url,
