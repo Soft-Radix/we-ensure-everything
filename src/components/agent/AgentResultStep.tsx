@@ -81,8 +81,8 @@ const AgentResultStep = ({
             Searching Beyond Local...
           </h2>
           <p className="text-slate-500 mb-10 leading-relaxed">
-            We don&apos;t have an exclusive agent in that specific county yet,
-            but our regional specialists are being notified.{" "}
+            {/* We don&apos;t have an exclusive agent in that specific county yet,
+            but our regional specialists are being notified.{" "} */}
             {routingResult.message}
           </p>
           <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200 inline-block">

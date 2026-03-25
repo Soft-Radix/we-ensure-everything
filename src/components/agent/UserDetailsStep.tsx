@@ -146,7 +146,7 @@ const UserDetailsStep = ({
                       setCounties([]);
                       setCountySearch(`${c.name}, ${c.state_abbr}`);
                     }}
-                    className="w-full text-left px-6 py-4 hover:bg-brand-gold/10 flex justify-between items-center transition-colors border-b border-slate-50 last:border-0"
+                    className="w-full cursor-pointer text-left px-6 py-4 hover:bg-brand-gold/10 flex justify-between items-center transition-colors border-b border-slate-50 last:border-0"
                   >
                     <span className="font-bold text-brand-navy">{c.name}</span>
                     <span className="text-sm text-slate-400">
