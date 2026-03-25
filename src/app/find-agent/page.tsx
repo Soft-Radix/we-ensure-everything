@@ -32,9 +32,11 @@ function FindAgentContent() {
   const [step, setStep] = useState<Step>(initCategory ? 2 : 1);
   const [counties, setCounties] = useState<County[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [states, setStates] = useState<any[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [countySearch, setCountySearch] = useState("");
   const [selectedCounty, setSelectedCounty] = useState<County | null>(null);
+  const [selectedState, setSelectedState] = useState<any | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
     null,
   );
@@ -61,6 +63,10 @@ function FindAgentContent() {
           if (found) setSelectedCategory(found);
         }
       });
+
+    fetch("/api/states")
+      .then((r) => r.json())
+      .then((d) => setStates(d.states || []));
   }, [initCategory]);
 
   /* Search counties */
@@ -70,12 +76,18 @@ function FindAgentContent() {
       return;
     }
     const timer = setTimeout(() => {
-      fetch(`/api/counties?q=${encodeURIComponent(countySearch)}&limit=20`)
+      const stateParam =
+        selectedState && selectedState.code !== "ALL"
+          ? `&state=${selectedState.code}`
+          : "";
+      fetch(
+        `/api/counties?q=${encodeURIComponent(countySearch)}&limit=20${stateParam}`,
+      )
         .then((r) => r.json())
         .then((d) => setCounties(d.counties || []));
     }, 280);
     return () => clearTimeout(timer);
-  }, [countySearch]);
+  }, [countySearch, selectedState]);
 
   /* Load products when category selected */
   useEffect(() => {
@@ -175,12 +187,7 @@ function FindAgentContent() {
               setStep={setStep}
               selectedCategory={selectedCategory}
               selectedProduct={selectedProduct}
-              // form={form}
-              // setForm={setForm}
-              // formErrors={formErrors}
-              // setFormErrors={setFormErrors}
               loading={loading}
-              // handleSubmit={handleSubmit}
               countySearch={countySearch}
               setCountySearch={setCountySearch}
               selectedCounty={selectedCounty}
@@ -191,6 +198,9 @@ function FindAgentContent() {
               setSelectedProduct={setSelectedProduct}
               formik={formik}
               extraErrors={extraErrors}
+              states={states}
+              selectedState={selectedState}
+              setSelectedState={setSelectedState}
             />
           )}
 

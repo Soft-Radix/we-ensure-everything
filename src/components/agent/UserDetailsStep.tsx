@@ -14,6 +14,9 @@ const UserDetailsStep = ({
   selectedProduct,
   setSelectedProduct,
   setCounties,
+  states,
+  selectedState,
+  setSelectedState,
 }: any) => {
   return (
     <div className="p-10 md:p-10 animate-fade-in">
@@ -35,54 +38,101 @@ const UserDetailsStep = ({
               county.
             </p>
 
-            <div className="relative group">
-              <input
-                type="text"
-                value={countySearch}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setCountySearch(val);
-                  // Reset selected county if user starts typing something else
-                  if (
-                    selectedCounty &&
-                    val !==
-                      `${selectedCounty.name} County, ${selectedCounty.state_abbr}`
-                  ) {
+            <div className="grid grid-cols-1 gap-4 mb-4">
+              <div>
+                <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2">
+                  1. Your State
+                </label>
+                <select
+                  value={selectedState?.code || "ALL"}
+                  onChange={(e) => {
+                    const code = e.target.value;
+                    if (code === "ALL") {
+                      setSelectedState({ code: "ALL", name: "All States" });
+                    } else {
+                      const s = states.find((st: any) => st.code === code);
+                      setSelectedState(s);
+                    }
+                    // Reset county on state change
                     setSelectedCounty(null);
-                  }
-                }}
-                placeholder="Search your county (e.g. Miami-Dade)"
-                className={`w-full pl-6 pr-14 py-4 bg-slate-50 border-2 rounded-2xl text-lg outline-none transition-all
-                          ${extraErrors.county ? "border-red-400 focus:border-red-500" : "border-slate-100 focus:border-brand-gold"}`}
-              />
-              {selectedCounty ? (
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-3">
-                  <span className="text-brand-accent-green font-bold text-sm hidden sm:block uppercase tracking-wider animate-fade-in">
-                    ✓
-                  </span>
-                  <button
-                    onClick={() => {
-                      setSelectedCounty(null);
-                      setCountySearch("");
+                    setCountySearch("");
+                    setCounties([]);
+                  }}
+                  className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-lg outline-none focus:border-brand-gold transition-all appearance-none cursor-pointer"
+                  style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "right 1.5rem center",
+                    backgroundSize: "1.5rem",
+                  }}
+                >
+                  <option value="ALL">All States</option>
+                  {states.map((s: any) => (
+                    <option key={s.id} value={s.code}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="relative group">
+                <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2">
+                  2. Your County
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={countySearch}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setCountySearch(val);
+                      // Reset selected county if user starts typing something else
+                      if (
+                        selectedCounty &&
+                        val !==
+                          `${selectedCounty.name} County, ${selectedCounty.state_abbr}`
+                      ) {
+                        setSelectedCounty(null);
+                      }
                     }}
-                    className="w-7 h-7 bg-slate-200 hover:bg-slate-300 rounded-full flex items-center justify-center text-slate-500 transition-colors"
-                  >
-                    ✕
-                  </button>
+                    placeholder={
+                      selectedState?.code && selectedState?.code !== "ALL"
+                        ? `Search in ${selectedState.name}...`
+                        : "Search your county (e.g. Miami-Dade)"
+                    }
+                    className={`w-full pl-6 pr-14 py-4 bg-slate-50 border-2 rounded-2xl text-lg outline-none transition-all
+                              ${extraErrors.county ? "border-red-400 focus:border-red-500" : "border-slate-100 focus:border-brand-gold"}`}
+                  />
+                  {selectedCounty ? (
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-3">
+                      <span className="text-brand-accent-green font-bold text-sm hidden sm:block uppercase tracking-wider animate-fade-in">
+                        ✓
+                      </span>
+                      <button
+                        onClick={() => {
+                          setSelectedCounty(null);
+                          setCountySearch("");
+                        }}
+                        className="w-7 h-7 bg-slate-200 hover:bg-slate-300 rounded-full flex items-center justify-center text-slate-500 transition-colors"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ) : (
+                    countySearch && (
+                      <button
+                        onClick={() => {
+                          setCountySearch("");
+                          setCounties([]);
+                        }}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 w-7 h-7 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-400 transition-colors"
+                      >
+                        ✕
+                      </button>
+                    )
+                  )}
                 </div>
-              ) : (
-                countySearch && (
-                  <button
-                    onClick={() => {
-                      setCountySearch("");
-                      setCounties([]);
-                    }}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 w-7 h-7 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-400 transition-colors"
-                  >
-                    ✕
-                  </button>
-                )
-              )}
+              </div>
             </div>
 
             {/* Dropdown */}
