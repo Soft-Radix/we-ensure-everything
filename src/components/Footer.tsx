@@ -2,12 +2,18 @@ import Image from "next/image";
 import Link from "next/link";
 
 const categories = [
-  { name: "Commercial Insurance", href: "/find-agent?category=COMMERCIAL" },
-  { name: "Health, Life & Disability", href: "/find-agent?category=HEALTH" },
-  { name: "Personal Insurance", href: "/find-agent?category=PERSONAL" },
-  { name: "Medicare & Senior", href: "/find-agent?category=MEDICARE" },
-  { name: "Financial & Legal", href: "/find-agent?category=FINANCIAL" },
-  { name: "Group Benefits", href: "/find-agent?category=GROUP" },
+  { name: "Auto & Vehicle", href: "/find-agent?category=AUTO_VEHICLE" },
+  {
+    name: "Property & Casualty",
+    href: "/find-agent?category=PROPERTY_CASUALTY",
+  },
+  { name: "Health", href: "/find-agent?category=HEALTH" },
+  { name: "Life & Disability", href: "/find-agent?category=LIFE_DISABILITY" },
+  {
+    name: "Business & Commercial",
+    href: "/find-agent?category=BUSINESS_COMMERCIAL",
+  },
+  { name: "Niche & Specialty", href: "/find-agent?category=NICHE_SPECIALTY" },
 ];
 
 const quickLinks = [

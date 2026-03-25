@@ -9,13 +9,13 @@ USE weinsure_dev;
 -- ─────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS counties (
   id        INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  fips_code VARCHAR(5)   NOT NULL UNIQUE COMMENT 'FIPS 5-digit code',
   name      VARCHAR(100) NOT NULL,
   state     VARCHAR(50)  NOT NULL,
   state_abbr CHAR(2)     NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   INDEX idx_state (state_abbr),
-  INDEX idx_name  (name)
+  INDEX idx_name  (name),
+  UNIQUE KEY uk_county_state (name, state_abbr)
 ) ENGINE=InnoDB;
 
 -- ─────────────────────────────────────────────
@@ -169,12 +169,12 @@ CREATE TABLE IF NOT EXISTS routing_logs (
 -- 9. SEED: Categories
 -- ─────────────────────────────────────────────
 INSERT IGNORE INTO categories (code, name, description, icon, sort_order) VALUES
-  ('COMMERCIAL', 'Commercial Insurance',   'Comprehensive coverage for businesses of all sizes',      '/icons/commercial.png', 1),
-  ('HEALTH',     'Health, Life & Disability','Individual and group health, life, and disability',     '/icons/health.png',     2),
-  ('PERSONAL',   'Personal Insurance',     'Auto, home, and personal lines coverage',                '/icons/personal.png',   3),
-  ('MEDICARE',   'Medicare & Senior',      'Medicare supplements and senior care solutions',          '/icons/senior.png',     4),
-  ('FINANCIAL',  'Financial & Legal',      'Financial protection and legal expense coverage',         '/icons/legal.png',      5),
-  ('GROUP',      'Group Benefits',         'Employee benefits and group administration',              '/icons/group.png',      6);
+  ('AUTO_VEHICLE',     'Auto & Vehicle',         'Coverage for cars, trucks, and other vehicles',             '/icons/personal.png',   1),
+  ('PROPERTY_CASUALTY','Property & Casualty',   'General property and liability insurance',                  '/icons/personal.png',   2),
+  ('HEALTH',           'Health',                 'Individual and group health insurance solutions',           '/icons/health.png',     3),
+  ('LIFE_DISABILITY',  'Life & Disability',      'Life insurance and disability protection',                  '/icons/health.png',     4),
+  ('BUSINESS_COMMERCIAL','Business & Commercial','Comprehensive coverage for businesses of all sizes',        '/icons/commercial.png', 5),
+  ('NICHE_SPECIALTY',  'Niche & Specialty',      'Specialized and unique insurance products',                 '/icons/legal.png',      6);
 
 -- ─────────────────────────────────────────────
 -- 10. SEED: Products
@@ -182,81 +182,138 @@ INSERT IGNORE INTO categories (code, name, description, icon, sort_order) VALUES
 INSERT IGNORE INTO products (category_id, code, name, sort_order)
 SELECT c.id, p.code, p.name, p.sort_order FROM categories c
 JOIN (
-  SELECT 'COMMERCIAL' AS cat, 'BOP'      AS code, 'Business Owners Policy (BOP)'             AS name, 1  AS sort_order UNION ALL
-  SELECT 'COMMERCIAL', 'GL',         'General Liability',                                             2  UNION ALL
-  SELECT 'COMMERCIAL', 'WC',         'Workers\' Compensation',                                         3  UNION ALL
-  SELECT 'COMMERCIAL', 'COMM_AUTO',  'Commercial Auto',                                               4  UNION ALL
-  SELECT 'COMMERCIAL', 'PROP',       'Commercial Property',                                            5  UNION ALL
-  SELECT 'COMMERCIAL', 'CYBER',      'Cyber Liability',                                               6  UNION ALL
-  SELECT 'COMMERCIAL', 'EPLI',       'Employment Practices Liability',                                7  UNION ALL
-  SELECT 'COMMERCIAL', 'PROF',       'Professional Liability / E&O',                                  8  UNION ALL
-  SELECT 'COMMERCIAL', 'SURETY',     'Surety Bonds',                                                  9  UNION ALL
-  SELECT 'COMMERCIAL', 'MARINE',     'Inland Marine',                                                10  UNION ALL
-  SELECT 'COMMERCIAL', 'EXCESS',     'Excess & Umbrella',                                            11  UNION ALL
-  SELECT 'HEALTH', 'IND_HEALTH',     'Individual Health',                                             1  UNION ALL
-  SELECT 'HEALTH', 'HEALTH_1099',    'Health for Independent Contractors & 1099s',                    2  UNION ALL
-  SELECT 'HEALTH', 'LIFE',           'Life Insurance',                                                3  UNION ALL
-  SELECT 'HEALTH', 'DISABILITY',     'Disability Insurance',                                          4  UNION ALL
-  SELECT 'HEALTH', 'LTC',            'Long-Term Care (LTC)',                                          5  UNION ALL
-  SELECT 'HEALTH', 'ANNUITIES',      'Annuities',                                                     6  UNION ALL
-  SELECT 'HEALTH', 'DENTAL',         'Dental & Vision',                                               7  UNION ALL
-  SELECT 'HEALTH', 'CRITICAL',       'Critical Illness',                                              8  UNION ALL
-  SELECT 'HEALTH', 'ACCIDENT',       'Accident Insurance',                                            9  UNION ALL
-  SELECT 'HEALTH', 'HOSPITAL',       'Hospital Indemnity',                                           10  UNION ALL
-  SELECT 'PERSONAL', 'HOME',         'Homeowners Insurance',                                          1  UNION ALL
-  SELECT 'PERSONAL', 'AUTO',         'Personal Auto',                                                 2  UNION ALL
-  SELECT 'PERSONAL', 'RENTERS',      'Renters Insurance',                                             3  UNION ALL
-  SELECT 'PERSONAL', 'UMBRELLA',     'Personal Umbrella',                                             4  UNION ALL
-  SELECT 'PERSONAL', 'BOAT',         'Boat & Watercraft',                                             5  UNION ALL
-  SELECT 'PERSONAL', 'RV',           'RV & Motorsports',                                              6  UNION ALL
-  SELECT 'PERSONAL', 'CONDO',        'Condo Insurance',                                               7  UNION ALL
-  SELECT 'PERSONAL', 'FLOOD',        'Flood Insurance',                                               8  UNION ALL
-  SELECT 'PERSONAL', 'EARTHQUAKE',   'Earthquake Insurance',                                          9  UNION ALL
-  SELECT 'PERSONAL', 'JEWELRY',      'Jewelry & Valuables',                                          10  UNION ALL
-  SELECT 'MEDICARE', 'MED_SUPP',     'Medicare Supplement (Medigap)',                                 1  UNION ALL
-  SELECT 'MEDICARE', 'MED_ADV',      'Medicare Advantage (Part C)',                                   2  UNION ALL
-  SELECT 'MEDICARE', 'PART_D',       'Medicare Part D (Prescription)',                                3  UNION ALL
-  SELECT 'MEDICARE', 'FINAL_EXP',    'Final Expense / Burial Insurance',                              4  UNION ALL
-  SELECT 'MEDICARE', 'SNP',          'Special Needs Plans (SNP)',                                     5  UNION ALL
-  SELECT 'MEDICARE', 'DSNP',         'Dual Eligible SNP (D-SNP)',                                     6  UNION ALL
-  SELECT 'MEDICARE', 'NURSING',      'Nursing Home / Facility Care',                                  7  UNION ALL
-  SELECT 'MEDICARE', 'HOME_CARE',    'Home Health Care Coverage',                                     8  UNION ALL
-  SELECT 'FINANCIAL', 'IUL',         'Indexed Universal Life (IUL)',                                  1  UNION ALL
-  SELECT 'FINANCIAL', 'WHOLE',       'Whole Life Insurance',                                          2  UNION ALL
-  SELECT 'FINANCIAL', 'TERM',        'Term Life Insurance',                                           3  UNION ALL
-  SELECT 'FINANCIAL', 'FIXED_ANN',   'Fixed Annuities',                                              4  UNION ALL
-  SELECT 'FINANCIAL', 'VARIABLE',    'Variable Annuities',                                            5  UNION ALL
-  SELECT 'FINANCIAL', 'LEGAL',       'Legal Expense Insurance',                                       6  UNION ALL
-  SELECT 'FINANCIAL', 'ID_THEFT',    'Identity Theft Protection',                                     7  UNION ALL
-  SELECT 'FINANCIAL', '401K',        '401(k) Rollover / IRA',                                        8  UNION ALL
-  SELECT 'FINANCIAL', 'WEALTH',      'Wealth Management & Protection',                                9  UNION ALL
-  SELECT 'GROUP', 'GROUP_HEALTH',    'Group Health Insurance',                                        1  UNION ALL
-  SELECT 'GROUP', 'GROUP_LIFE',      'Group Life Insurance',                                          2  UNION ALL
-  SELECT 'GROUP', 'GROUP_DENTAL',    'Group Dental & Vision',                                         3  UNION ALL
-  SELECT 'GROUP', 'GROUP_DIS',       'Group Disability Insurance',                                    4  UNION ALL
-  SELECT 'GROUP', 'GROUP_401K',      'Group 401(k) Plans',                                            5  UNION ALL
-  SELECT 'GROUP', 'HRA',             'Health Reimbursement Arrangements (HRA)',                       6  UNION ALL
-  SELECT 'GROUP', 'HSA',             'Health Savings Accounts (HSA)',                                 7  UNION ALL
-  SELECT 'GROUP', 'FSA',             'Flexible Spending Accounts (FSA)',                              8  UNION ALL
-  SELECT 'GROUP', 'COBRA',           'COBRA Administration',                                          9  UNION ALL
-  SELECT 'GROUP', 'WELLNESS',        'Employee Wellness Programs',                                   10  UNION ALL
-  SELECT 'GROUP', 'VOLUNTARY',       'Voluntary Benefits',                                           11
+  -- AUTO_VEHICLE
+  SELECT 'AUTO_VEHICLE' AS cat, 'AUTO' AS code, 'Auto' AS name, 1 AS sort_order UNION ALL
+  SELECT 'AUTO_VEHICLE', 'BUSINESS_AUTO', 'Business Auto', 2 UNION ALL
+  SELECT 'AUTO_VEHICLE', 'CLASSIC_CAR', 'Classic Car', 3 UNION ALL
+  SELECT 'AUTO_VEHICLE', 'MOTORCYCLE', 'Motorcycle', 4 UNION ALL
+  SELECT 'AUTO_VEHICLE', 'OFF_ROAD', 'Off Road Vehicle', 5 UNION ALL
+  SELECT 'AUTO_VEHICLE', 'RV', 'RV', 6 UNION ALL
+  SELECT 'AUTO_VEHICLE', 'SR22', 'SR-22', 7 UNION ALL
+  SELECT 'AUTO_VEHICLE', 'SNOWMOBILE', 'Snowmobile', 8 UNION ALL
+  SELECT 'AUTO_VEHICLE', 'WATERCRAFT', 'Watercraft', 9 UNION ALL
+  SELECT 'AUTO_VEHICLE', 'YACHT', 'Yacht', 10 UNION ALL
+
+  -- PROPERTY_CASUALTY
+  SELECT 'PROPERTY_CASUALTY', 'CONDO', 'Condo', 11 UNION ALL
+  SELECT 'PROPERTY_CASUALTY', 'FLOOD', 'Flood', 12 UNION ALL
+  SELECT 'PROPERTY_CASUALTY', 'HOME', 'Home', 13 UNION ALL
+  SELECT 'PROPERTY_CASUALTY', 'HOME_AUTO', 'Home & Auto', 14 UNION ALL
+  SELECT 'PROPERTY_CASUALTY', 'HOME_WARRANTY', 'Home Warranty', 15 UNION ALL
+  SELECT 'PROPERTY_CASUALTY', 'LANDLORD_RENTAL', 'Landlord & Rental Prop', 16 UNION ALL
+  SELECT 'PROPERTY_CASUALTY', 'MOBILE_HOME', 'Mobile Home', 17 UNION ALL
+  SELECT 'PROPERTY_CASUALTY', 'RENTAL_PROP', 'Rental Property', 18 UNION ALL
+  SELECT 'PROPERTY_CASUALTY', 'RENTER', 'Renter', 19 UNION ALL
+  SELECT 'PROPERTY_CASUALTY', 'SECONDARY_HOME', 'Secondary Home', 20 UNION ALL
+  SELECT 'PROPERTY_CASUALTY', 'SHORT_TERM_RENTAL', 'Short Term Rental', 21 UNION ALL
+  SELECT 'PROPERTY_CASUALTY', 'SINKHOLE', 'Sinkhole', 22 UNION ALL
+  SELECT 'PROPERTY_CASUALTY', 'UMBRELLA', 'Umbrella', 23 UNION ALL
+  SELECT 'PROPERTY_CASUALTY', 'VACANT_HOME', 'Vacant Home', 24 UNION ALL
+  SELECT 'PROPERTY_CASUALTY', 'VALUABLE_POSS', 'Valuable Possessions', 25 UNION ALL
+
+  -- HEALTH
+  SELECT 'HEALTH', 'FSA', 'FSA', 26 UNION ALL
+  SELECT 'HEALTH', 'HAS', 'HSA (HAS)', 27 UNION ALL
+  SELECT 'HEALTH', 'HRA', 'HRA', 28 UNION ALL
+  SELECT 'HEALTH', 'GROUP_ACCIDENT', 'Group Accident', 29 UNION ALL
+  SELECT 'HEALTH', 'GROUP_DENTAL', 'Group Dental', 30 UNION ALL
+  SELECT 'HEALTH', 'GROUP_HEALTH', 'Group Health', 31 UNION ALL
+  SELECT 'HEALTH', 'GROUP_HOSPITAL', 'Group Hospital', 32 UNION ALL
+  SELECT 'HEALTH', 'GROUP_TELEMEDICINE', 'Group Telemedicine', 33 UNION ALL
+  SELECT 'HEALTH', 'GROUP_VISION', 'Group Vision', 34 UNION ALL
+  SELECT 'HEALTH', 'INDIV_DENTAL', 'Indiv Dental', 35 UNION ALL
+  SELECT 'HEALTH', 'INDIV_TELEMEDICINE', 'Indiv Telemedicine', 36 UNION ALL
+  SELECT 'HEALTH', 'INDIV_VISION', 'Indiv Vision', 37 UNION ALL
+  SELECT 'HEALTH', 'MEDICARE', 'Medicare', 38 UNION ALL
+  SELECT 'HEALTH', 'GROUP_VOLUNTARY', 'Group Voluntary Benefits', 39 UNION ALL
+
+  -- LIFE_DISABILITY
+  SELECT 'LIFE_DISABILITY', '401K', '401K', 40 UNION ALL
+  SELECT 'LIFE_DISABILITY', 'ANNUITIES', 'Annuities', 41 UNION ALL
+  SELECT 'LIFE_DISABILITY', 'IRA', 'IRA', 42 UNION ALL
+  SELECT 'LIFE_DISABILITY', 'CHILD_LIFE', 'Child Life', 43 UNION ALL
+  SELECT 'LIFE_DISABILITY', 'CRITICAL_ILLNESS', 'Critical Illness', 44 UNION ALL
+  SELECT 'LIFE_DISABILITY', 'DISABILITY', 'Disability', 45 UNION ALL
+  SELECT 'LIFE_DISABILITY', 'GROUP_SUPP_LIFE', 'Group Supplemental Life', 46 UNION ALL
+  SELECT 'LIFE_DISABILITY', 'INDIV_LIFE', 'Indiv Life', 47 UNION ALL
+  SELECT 'LIFE_DISABILITY', 'KEY_PERSON', 'Key Person Life', 48 UNION ALL
+  SELECT 'LIFE_DISABILITY', 'LIFE_AD_D', 'Life and AD&D', 49 UNION ALL
+  SELECT 'LIFE_DISABILITY', 'LTC', 'LTC', 50 UNION ALL
+  SELECT 'LIFE_DISABILITY', 'LTD', 'LTD', 51 UNION ALL
+  SELECT 'LIFE_DISABILITY', 'MORTGAGE_PROT', 'Mortgage Protection', 52 UNION ALL
+
+  -- BUSINESS_COMMERCIAL
+  SELECT 'BUSINESS_COMMERCIAL', 'BUILDERS_RISK', 'Builders Risk', 53 UNION ALL
+  SELECT 'BUSINESS_COMMERCIAL', 'BUSINESS_INTERRUPTION', 'Business Interruption', 54 UNION ALL
+  SELECT 'BUSINESS_COMMERCIAL', 'BOP', 'Business owners', 55 UNION ALL
+  SELECT 'BUSINESS_COMMERCIAL', 'CAPTIVE', 'Captive Insurance', 56 UNION ALL
+  SELECT 'BUSINESS_COMMERCIAL', 'COMM_BONDS', 'Commercial Bonds', 57 UNION ALL
+  SELECT 'BUSINESS_COMMERCIAL', 'COMM_CONSTRUCTION', 'Commercial Construction', 58 UNION ALL
+  SELECT 'BUSINESS_COMMERCIAL', 'COMM_HURRICANE', 'Commercial Hurricane', 59 UNION ALL
+  SELECT 'BUSINESS_COMMERCIAL', 'COMM_PROPERTY', 'Commercial Property', 60 UNION ALL
+  SELECT 'BUSINESS_COMMERCIAL', 'COMM_UMBRELLA', 'Commercial Umbrella', 61 UNION ALL
+  SELECT 'BUSINESS_COMMERCIAL', 'CRIME', 'Crime', 62 UNION ALL
+  SELECT 'BUSINESS_COMMERCIAL', 'CYBER', 'Cyber Liability', 63 UNION ALL
+  SELECT 'BUSINESS_COMMERCIAL', 'D_O', 'Directors & Officers Liability', 64 UNION ALL
+  SELECT 'BUSINESS_COMMERCIAL', 'E_O', 'E&O', 65 UNION ALL
+  SELECT 'BUSINESS_COMMERCIAL', 'EAP', 'Employee Assist Plan', 66 UNION ALL
+  SELECT 'BUSINESS_COMMERCIAL', 'EPLI', 'Employment Practice Liability', 67 UNION ALL
+  SELECT 'BUSINESS_COMMERCIAL', 'ENVIRONMENTAL', 'Environmental', 68 UNION ALL
+  SELECT 'BUSINESS_COMMERCIAL', 'EXCESS_LIABILITY', 'Excess Liability', 69 UNION ALL
+  SELECT 'BUSINESS_COMMERCIAL', 'FIDUCIARY', 'Fiduciary Liability', 70 UNION ALL
+  SELECT 'BUSINESS_COMMERCIAL', 'GEN_LIABILITY', 'Gen Liability', 71 UNION ALL
+  SELECT 'BUSINESS_COMMERCIAL', 'INLAND_MARINE', 'Inland Marine', 72 UNION ALL
+  SELECT 'BUSINESS_COMMERCIAL', 'LIQUOR_LIABILITY', 'Liquor Liability', 73 UNION ALL
+  SELECT 'BUSINESS_COMMERCIAL', 'OCEAN_MARINE', 'Ocean Marine', 74 UNION ALL
+  SELECT 'BUSINESS_COMMERCIAL', 'PAYROLL_HR', 'Payroll/HR', 75 UNION ALL
+  SELECT 'BUSINESS_COMMERCIAL', 'RISK_MGMT', 'Risk Management', 76 UNION ALL
+  SELECT 'BUSINESS_COMMERCIAL', 'SURETY_BOND', 'Surety Bond', 77 UNION ALL
+  SELECT 'BUSINESS_COMMERCIAL', 'SYSTEMS_BREAKDOWN', 'Systems Breakdown', 78 UNION ALL
+  SELECT 'BUSINESS_COMMERCIAL', 'WORKERS_COMP', 'Workers Comp', 79 UNION ALL
+
+  -- NICHE_SPECIALTY
+  SELECT 'NICHE_SPECIALTY', 'DEBT_SETTLEMENT', 'Debt Settlement', 80 UNION ALL
+  SELECT 'NICHE_SPECIALTY', 'EVENT', 'Event', 81 UNION ALL
+  SELECT 'NICHE_SPECIALTY', 'SPECIAL_EVENT', 'Special Event', 82 UNION ALL
+  SELECT 'NICHE_SPECIALTY', 'WEDDING', 'Wedding', 83 UNION ALL
+  SELECT 'NICHE_SPECIALTY', 'IDENTITY_THEFT', 'Identity Theft', 84 UNION ALL
+  SELECT 'NICHE_SPECIALTY', 'LEGAL', 'Legal', 85 UNION ALL
+  SELECT 'NICHE_SPECIALTY', 'TAX_ADVISORY', 'Tax Advisory', 86 UNION ALL
+  SELECT 'NICHE_SPECIALTY', 'NATURAL_DISASTER', 'Natural Disaster', 87 UNION ALL
+  SELECT 'NICHE_SPECIALTY', 'PET', 'Pet', 88 UNION ALL
+  SELECT 'NICHE_SPECIALTY', 'PROBATE_BOND', 'Probate Bond', 89 UNION ALL
+  SELECT 'NICHE_SPECIALTY', 'TRAVEL', 'Travel', 90 UNION ALL
+  SELECT 'NICHE_SPECIALTY', 'VACANT_BUILDING', 'Vacant Building', 91
 ) p ON c.code = p.cat;
 
 -- ─────────────────────────────────────────────
 -- 11. SEED: Agents
 -- ─────────────────────────────────────────────
-INSERT IGNORE INTO agents (ghl_user_id, full_name, email, phone, license_no, license_state, bio, status) VALUES
-  ('user_101', 'John Doe', 'john.doe@agentpro.com', '(555) 123-4567', 'LIC-98765', 'CA', 'Commercial insurance specialist with 15+ years of experience helping businesses mitigate risk.', 'active'),
-  ('user_102', 'Jane Smith', 'jane.smith@agentpro.com', '(555) 234-5678', 'LIC-87654', 'NY', 'Dedicated to providing comprehensive health and life insurance solutions for families and individuals.', 'active'),
-  ('user_103', 'Robert Johnson', 'robert.j@agentpro.com', '(555) 345-6789', 'LIC-76543', 'TX', 'Expert in personal lines, ensuring your home and auto are protected with the best coverage options.', 'active'),
-  ('user_104', 'Emily Brown', 'emily.brown@agentpro.com', '(555) 456-7890', 'LIC-65432', 'FL', 'Specializing in Medicare Advantage and Supplement plans for over a decade.', 'active'),
-  ('user_105', 'Michael Wilson', 'm.wilson@agentpro.com', '(555) 567-8901', 'LIC-54321', 'IL', 'Helping clients navigate complex financial and legal protection strategies.', 'active'),
-  ('user_110', 'Sarah Davis', 'sarah.davis@agentpro.com', '(555) 678-9012', 'LIC-43210', 'GA', 'Group benefits expert focusing on employee retention through superior benefits packages.', 'active'),
-  ('user_111', 'David Garcia', 'dave.garcia@agentpro.com', '(555) 789-0123', 'LIC-32109', 'AZ', 'Passionate about finding the right auto and property solutions for my community.', 'active'),
-  ('user_112', 'Jessica Martinez', 'jessica.m@agentpro.com', '(555) 890-1234', 'LIC-21098', 'WA', 'Focused on luxury home and specialized umbrella policies for high-net-worth clients.', 'active'),
-  ('user_109', 'William Anderson', 'william.a@agentpro.com', '(555) 901-2345', 'LIC-10987', 'OH', 'Providing peace of mind through tailored life and long-term care insurance.', 'active'),
-  ('user_113', 'Ashley Taylor', 'ashley.t@agentpro.com', '(555) 012-3456', 'LIC-09876', 'NC', 'Expert in business owners policies and general liability for startups.', 'active');
+INSERT IGNORE INTO agents (ghl_user_id, full_name, email, phone, state_abbr, county, category, product, status) VALUES
+  ('ghl_001', 'Brandon Elliott', 'brandon@insureboost.com', '3214503600', 'FL', 'General', 'HEALTH', 'HEALTH', 'inactive'),
+  ('ghl_002', 'Corey Jermaine Jackson', 'coreyjackson12@gmail.com', '8133594949', 'FL', 'General', 'LIFE_DISABILITY', 'LIFE', 'inactive'),
+  ('ghl_003', 'Cynthia Rodriguez', 'cynthia.rodriguez@simplifiedhealthcaresolution.com', '2158691422', 'FL', 'General', 'HEALTH', 'MEDICARE', 'inactive'),
+  ('ghl_004', 'Greg Roe', 'greg@roeins.com', '8132638715', 'FL', 'General', 'BUSINESS_COMMERCIAL', 'COMMERCIAL', 'inactive'),
+  ('ghl_005', 'James Sebest', 'james@john-galt.com', '9542143751', 'FL', 'General', 'BUSINESS_COMMERCIAL', 'COMMERCIAL', 'inactive'),
+  ('ghl_006', 'Joseph Menachem', 'joseph@markerinsurance.com', '9544567505', 'FL', 'General', 'BUSINESS_COMMERCIAL', 'MARINE', 'inactive'),
+  ('ghl_007', 'Ken Tolchin', 'ken@practicalinsurancesolutions.com', '5612128092', 'FL', 'General', 'LIFE_DISABILITY', 'ANNUITIES', 'inactive'),
+  ('ghl_008', 'Paul Vawrock', 'paul@vawrock.com', '8139291150', 'FL', 'Pasco', 'HEALTH', 'HEALTH', 'inactive'),
+  ('ghl_011', 'Brandon Rapose', 'coveragewithbrandon@gmail.com', '4842744257', 'FL', 'General', 'HEALTH', 'HEALTH', 'inactive'),
+  ('ghl_012', 'Mikell Simmons', 'mike@weinsureeverything.com', '9544054015', 'FL', 'General', 'HEALTH', 'HEALTH', 'inactive'),
+  ('ghl_013', 'Kenneth Bryant', 'kenneth.bryant@kbagencygroup.com', '4077150906', 'FL', 'General', 'LIFE_DISABILITY', 'LIFE', 'inactive'),
+  ('ghl_014', 'Rosalyn Jones', 'rosalyn@rljones.com', '3526423274', 'FL', 'Alachua', 'HEALTH', 'MEDICARE', 'inactive'),
+  ('ghl_015', 'Alex Brito', 'alex@singlepointes.com', '7862500016', 'FL', 'Miami-Dade', 'HEALTH', 'GROUP_VOLUNTARY', 'inactive'),
+  ('ghl_016', 'Imtiyaz Mavani', 'infinityinsurance2@gmail.com', '14692269495', 'TX', 'General', 'PROPERTY_CASUALTY', 'HOME', 'inactive'),
+  ('ghl_017', 'Cat Simmons', 'mikesimmons01@gmail.com', '19544054015', 'AR', 'Pulaski', 'BUSINESS_COMMERCIAL', 'BUILDERS_RISK', 'active'),
+  ('ghl_018', 'John Adams', 'jadams@test.com', '13055555555', 'IN', 'Marion', 'AUTO_VEHICLE', 'AUTO', 'active'),
+  ('ghl_019', 'Kamal Jones', 'kjones@test.com', '19545555555', 'AK', 'Anchorage', 'PROPERTY_CASUALTY', 'HOME', 'active'),
+  ('demo_001', 'Sarah Miller', 'sarah@agentpro-demo.com', '123-456-7890', 'CA', 'Los Angeles', 'AUTO_VEHICLE', 'AUTO', 'active'),
+  ('demo_002', 'John Thompson', 'john@agentpro-demo.com', '234-567-8901', 'TX', 'Dallas', 'PROPERTY_CASUALTY', 'HOME', 'active'),
+  ('demo_003', 'Elena Rodriguez', 'elena@agentpro-demo.com', '345-678-9012', 'FL', 'Miami-Dade', 'HEALTH', 'GROUP_HEALTH', 'active'),
+  ('demo_004', 'David Chen', 'david@agentpro-demo.com', '456-789-0123', 'NY', 'New York', 'LIFE_DISABILITY', 'INDIV_LIFE', 'active'),
+  ('demo_005', 'Jessica White', 'jessica@agentpro-demo.com', '567-890-1234', 'IL', 'Cook', 'BUSINESS_COMMERCIAL', 'BOP', 'active'),
+  ('demo_010', 'Justin Wu', 'justin@agentpro-demo.com', '012-345-6789', 'OH', 'Franklin', 'BUSINESS_COMMERCIAL', 'CYBER', 'active'),
+  ('demo_006', 'Michael Peterson', 'michael@agentpro-demo.com', '678-901-2345', 'GA', 'Fulton', 'NICHE_SPECIALTY', 'TRAVEL', 'active');
 
 -- ─────────────────────────────────────────────
 -- 12. SEED: Initial Seats (Exclusives)

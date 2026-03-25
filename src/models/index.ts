@@ -3,6 +3,7 @@ import Agent from "./Agent";
 import Category from "./Category";
 import Product from "./Product";
 import County from "./County";
+import State from "./State";
 import Seat from "./Seat";
 import Waitlist from "./Waitlist";
 import Lead from "./Lead";
@@ -13,6 +14,7 @@ const models = {
   Category,
   Product,
   County,
+  State,
   Seat,
   Waitlist,
   Lead,
@@ -27,6 +29,7 @@ export {
   Category,
   Product,
   County,
+  State,
   Seat,
   Waitlist,
   Lead,

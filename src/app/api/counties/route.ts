@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
 
     const counties = await County.findAll({
       where,
-      attributes: ["id", "fips_code", "name", "state", "state_abbr"],
+      attributes: ["id", "name", "state", "state_abbr"],
       order: [
         ["state_abbr", "ASC"],
         ["name", "ASC"],

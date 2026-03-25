@@ -1,7 +1,6 @@
 /* ── Types ───────────────────────────────────────────────────── */
 export interface County {
   id: number;
-  fips_code: string;
   name: string;
   state: string;
   state_abbr: string;
