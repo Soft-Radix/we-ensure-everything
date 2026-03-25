@@ -41,7 +41,7 @@ const CoverageStep = ({
                 setSelectedCategory(cat);
                 setStep(2);
               }}
-              className="group flex flex-col items-center gap-4 p-8 text-center border-2 border-slate-100 rounded-3xl hover:border-brand-gold hover:bg-slate-50 transition-all duration-300 hover:-translate-y-1"
+              className="group cursor-pointer flex flex-col items-center gap-4 p-8 text-center border-2 border-slate-100 rounded-3xl hover:border-brand-gold hover:bg-slate-50 transition-all duration-300 hover:-translate-y-1"
             >
               <div className="relative w-16 h-16 group-hover:scale-110 transition-transform">
                 <img
