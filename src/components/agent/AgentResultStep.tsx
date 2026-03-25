@@ -1,6 +1,19 @@
-import React from "react";
+import { RoutingStatus, Agent } from "@/lib/data/agentTypes";
 
-const AgentResultStep = ({ routingResult, setStep }: any) => {
+interface AgentResultStepProps {
+  routingResult: {
+    status: RoutingStatus;
+    agent?: Agent;
+    leadId?: string;
+    message?: string;
+  };
+  handleReset: () => void;
+}
+
+const AgentResultStep = ({
+  routingResult,
+  handleReset,
+}: AgentResultStepProps) => {
   return (
     <div className="p-10 md:p-10 animate-fade-in text-center">
       {routingResult.status === "assigned" && routingResult.agent && (
@@ -53,8 +66,8 @@ const AgentResultStep = ({ routingResult, setStep }: any) => {
           </div>
 
           <button
-            onClick={() => setStep(1)}
-            className="mt-12 text-brand-gold font-black uppercase tracking-widest hover:underline"
+            onClick={handleReset}
+            className="mt-12 cursor-pointer text-brand-gold font-black uppercase tracking-widest hover:underline"
           >
             Start New Search
           </button>
@@ -81,8 +94,8 @@ const AgentResultStep = ({ routingResult, setStep }: any) => {
             </code>
           </div>
           <button
-            onClick={() => setStep(1)}
-            className="mt-8 text-brand-gold font-black uppercase tracking-widest hover:underline"
+            onClick={handleReset}
+            className="mt-8 cursor-pointer text-brand-gold font-black uppercase tracking-widest hover:underline"
           >
             Start New Search
           </button>
@@ -103,8 +116,8 @@ const AgentResultStep = ({ routingResult, setStep }: any) => {
               "We encountered an error processing your request. Please try again or contact support."}
           </p>
           <button
-            onClick={() => setStep(1)}
-            className="bg-brand-navy text-white px-10 py-4 rounded-full font-bold"
+            onClick={handleReset}
+            className="bg-brand-navy cursor-pointer text-white px-10 py-4 rounded-full font-bold"
           >
             Return to Start
           </button>

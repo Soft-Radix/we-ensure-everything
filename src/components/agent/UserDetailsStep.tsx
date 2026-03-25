@@ -90,7 +90,7 @@ const UserDetailsStep = ({
                       if (
                         selectedCounty &&
                         val !==
-                          `${selectedCounty.name} County, ${selectedCounty.state_abbr}`
+                          `${selectedCounty.name}, ${selectedCounty.state_abbr}`
                       ) {
                         setSelectedCounty(null);
                       }
@@ -144,13 +144,11 @@ const UserDetailsStep = ({
                     onClick={() => {
                       setSelectedCounty(c);
                       setCounties([]);
-                      setCountySearch(`${c.name} County, ${c.state_abbr}`);
+                      setCountySearch(`${c.name}, ${c.state_abbr}`);
                     }}
                     className="w-full text-left px-6 py-4 hover:bg-brand-gold/10 flex justify-between items-center transition-colors border-b border-slate-50 last:border-0"
                   >
-                    <span className="font-bold text-brand-navy">
-                      {c.name} County
-                    </span>
+                    <span className="font-bold text-brand-navy">{c.name}</span>
                     <span className="text-sm text-slate-400">
                       {c.state_abbr}
                     </span>
@@ -251,7 +249,7 @@ const UserDetailsStep = ({
           <button
             onClick={formik.handleSubmit}
             disabled={loading}
-            className="w-full bg-brand-navy hover:bg-slate-800 text-white font-black py-5 rounded-2xl shadow-xl transition-all hover:-translate-y-1 mt-10 disabled:opacity-50"
+            className="w-full cursor-pointer bg-brand-navy hover:bg-slate-800 text-white font-black py-5 rounded-2xl shadow-xl transition-all hover:-translate-y-1 mt-10 disabled:opacity-50"
           >
             {loading ? "SEARCHING..." : "GET MATCHED NOW"}
           </button>

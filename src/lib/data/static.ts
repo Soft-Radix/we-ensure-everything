@@ -1,13 +1,13 @@
 export const categories = [
   {
     code: "AUTO_VEHICLE",
-    icon: "/icons/personal.png",
+    icon: "/icons/vehicle.png",
     name: "Auto & Vehicle",
     desc: "Coverage for cars, trucks, motorcycles, and RVs",
   },
   {
     code: "PROPERTY_CASUALTY",
-    icon: "/icons/personal.png",
+    icon: "/icons/property.png",
     name: "Property & Casualty",
     desc: "Homeowners, renters, and general liability coverage",
   },
@@ -19,7 +19,7 @@ export const categories = [
   },
   {
     code: "LIFE_DISABILITY",
-    icon: "/icons/health.png",
+    icon: "/icons/life.png",
     name: "Life & Disability",
     desc: "Life insurance, disability, and income protection",
   },
@@ -31,7 +31,7 @@ export const categories = [
   },
   {
     code: "NICHE_SPECIALTY",
-    icon: "/icons/legal.png",
+    icon: "/icons/niche.png",
     name: "Niche & Specialty",
     desc: "Highly specialized and industry-specific protection",
   },

@@ -1,14 +1,12 @@
 import { Step } from "@/lib/data/categories";
-import Image from "next/image";
-import React from "react";
 
 const imagesArray = [
-  "/icons/commercial.png",
+  "/icons/vehicle.png",
+  "/icons/property.png",
   "/icons/health.png",
-  "/icons/personal.png",
-  "/icons/senior.png",
-  "/icons/legal.png",
-  "/icons/group.png",
+  "/icons/life.png",
+  "/icons/commercial.png",
+  "/icons/niche.png",
 ];
 const CoverageStep = ({
   setSelectedCategory,

@@ -143,6 +143,17 @@ function FindAgentContent() {
       }
     },
   });
+  const handleReset = () => {
+    formik.resetForm();
+    setSelectedCounty(null);
+    setSelectedCategory(null);
+    setSelectedProduct(null);
+    setCountySearch("");
+    setSelectedState(null);
+    setRoutingResult(null);
+    setSubmitted(false);
+    setStep(1);
+  };
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Page header */}
@@ -206,7 +217,10 @@ function FindAgentContent() {
 
           {/* ── STEP 3: Match Result ───────────────────────────── */}
           {step === 3 && routingResult && (
-            <AgentResultStep routingResult={routingResult} setStep={setStep} />
+            <AgentResultStep
+              routingResult={routingResult}
+              handleReset={handleReset}
+            />
           )}
         </div>
       </div>
