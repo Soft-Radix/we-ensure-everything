@@ -96,8 +96,8 @@ export default function Footer() {
               with licensed insurance agents. We are not an insurance carrier.
             </p>
             <p className="text-white/60 text-[11px] leading-relaxed mb-4">
-              Agents are licensed in their respective states. Coverage matches
-              are provided by third-party licensed professionals and carriers.
+              Our agents are licensed in their respective states. Coverage options
+              are also provided by licensed professionals and carriers.
             </p>
             <div className="flex gap-4 items-center opacity-50">
               <span className="text-2xl">🔒</span>
