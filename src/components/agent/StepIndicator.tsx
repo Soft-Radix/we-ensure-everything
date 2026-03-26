@@ -2,7 +2,7 @@ import { Step } from "@/lib/data/categories";
 import React from "react";
 
 const StepIndicator = ({ current }: { current: Step }) => {
-  const steps = ["Coverage", "Details", "Match"];
+  const steps = ["Coverage", "Details", "Agent"];
   return (
     <div className="flex items-center gap-4 md:gap-12">
       {steps.map((label, i) => {

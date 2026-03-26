@@ -27,7 +27,7 @@ export default function HomePage() {
             <h1 className="text-5xl md:text-7xl font-heading font-black leading-[1.1] mb-8">
               Insurance Coverage. <br />
               <span className="text-brand-gold italic">
-                Matched to You.
+                Local Agents Near You.
               </span>{" "}
               <br />
               Anywhere in the U.S.
@@ -44,7 +44,7 @@ export default function HomePage() {
                 href="/find-agent"
                 className="inline-flex items-center justify-center gap-2 bg-brand-gold hover:bg-brand-gold-dark text-brand-navy font-black text-lg px-10 py-5 rounded-full no-underline transition-all hover:-translate-y-1 shadow-2xl"
               >
-                Get Matched in 60 Seconds
+                Meet Your Local Agent in 60 Seconds
               </Link>
               <Link
                 href="#categories"
@@ -99,7 +99,7 @@ export default function HomePage() {
                     {cat.desc}
                   </p>
                   <div className="flex items-center gap-2 text-brand-navy font-black text-sm uppercase tracking-wider">
-                    Get Matched
+                    Meet Local Agent
                     <span className="transform group-hover:translate-x-2 transition-transform">
                       →
                     </span>
@@ -203,7 +203,7 @@ export default function HomePage() {
                   <div className="space-y-6">
                     <blockquote className="text-slate-600 italic leading-relaxed">
                       &quot;I was tired of getting 20 calls from different
-                      agents. Here I was matched with one specialist who
+                      agents. Here I was connected with one specialist who
                       actually knew my county&apos;s specific requirements.
                       Highly recommend.&quot;
                     </blockquote>
@@ -219,7 +219,7 @@ export default function HomePage() {
                     href="/find-agent"
                     className="block text-center bg-brand-navy hover:bg-slate-800 text-white font-black py-4 rounded-2xl no-underline transition-all shadow-xl hover:shadow-2xl"
                   >
-                    Start Your Search Now
+                    Find Your In-Town Agent
                   </Link>
                 </div>
               </div>

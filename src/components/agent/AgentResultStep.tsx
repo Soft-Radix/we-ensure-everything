@@ -22,7 +22,7 @@ const AgentResultStep = ({
             ✓
           </div>
           <h2 className="text-3xl md:text-4xl font-heading font-black text-brand-navy mb-4">
-            We&apos;ve Found Your Match!
+            Our Local Agent Is Ready!
           </h2>
           <p className="text-slate-500 text-lg mb-12">
             Based on your location and needs, we&apos;ve connected you with a

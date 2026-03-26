@@ -24,7 +24,7 @@ const CoverageStep = ({
           What kind of coverage do you need?
         </h2>
         <p className="text-slate-500">
-          Select a category to begin your match process.
+          Select a category to find  our licensed local agent.
         </p>
       </div>
 

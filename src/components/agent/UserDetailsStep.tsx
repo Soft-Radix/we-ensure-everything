@@ -34,8 +34,8 @@ const UserDetailsStep = ({
               Where are you located?
             </h2>
             <p className="text-slate-500 text-sm mb-6">
-              We match you with agents licensed in your specific state and
-              county.
+              We connect you with our licensed agents in your specific state and
+              county who can serve your area.
             </p>
 
             <div className="grid grid-cols-1 gap-4 mb-4">
@@ -251,13 +251,13 @@ const UserDetailsStep = ({
             disabled={loading}
             className="w-full cursor-pointer bg-brand-navy hover:bg-slate-800 text-white font-black py-5 rounded-2xl shadow-xl transition-all hover:-translate-y-1 mt-10 disabled:opacity-50"
           >
-            {loading ? "SEARCHING..." : "GET MATCHED NOW"}
+            {loading ? "SEARCHING..." : "MEET YOUR LOCAL AGENT"}
           </button>
 
           <p className="text-[10px] text-slate-400 text-center leading-relaxed">
-            By clicking &quot;Get Matched Now&quot;, you agree to our terms.
+            By clicking &quot;Meet Your Local Agent&quot;, you agree to our terms.
             Your information is protected and will only be shared with your
-            matched licensed professional.
+            licensed local professional.
           </p>
         </div>
       </div>

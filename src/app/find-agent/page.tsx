@@ -161,10 +161,10 @@ function FindAgentContent() {
         <div className="absolute top-0 right-0 w-1/3 h-full bg-brand-gold/10 pointer-events-none skew-x-12 transform translate-x-20" />
         <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
           <span className="inline-block text-brand-gold font-bold text-sm uppercase tracking-[0.2em] mb-4">
-            Secure Matching System
+            Secure Local Agent Connection
           </span>
           <h1 className="text-3xl md:text-4xl font-heading font-black mb-6">
-            Get Matched with a Licensed Agent
+            Meet our Licensed Agent in Your Area
           </h1>
           <p className="text-white/60 text-lg md:text-lg max-w-2xl mx-auto font-light">
             Tell us what you need and we&apos;ll instantly connect you with a
@@ -215,7 +215,7 @@ function FindAgentContent() {
             />
           )}
 
-          {/* ── STEP 3: Match Result ───────────────────────────── */}
+          {/* ── STEP 3: Agent Result ───────────────────────────── */}
           {step === 3 && routingResult && (
             <AgentResultStep
               routingResult={routingResult}
