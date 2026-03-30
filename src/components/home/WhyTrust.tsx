@@ -40,7 +40,7 @@ const WhyTrust = () => {
             <div className="relative bg-white p-12 rounded-[2.5rem] shadow-2xl border border-slate-100">
               <div className="space-y-8">
                 <div className="flex items-center gap-4 border-b border-slate-100 pb-8">
-                  <div className="w-16 h-16 bg-brand-navy rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                  <div className="w-16 h-16 shrink-0 bg-brand-navy rounded-full flex items-center justify-center text-white text-2xl font-bold">
                     FL
                   </div>
                   <div>
