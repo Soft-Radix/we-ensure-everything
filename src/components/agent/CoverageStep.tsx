@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Step } from "@/lib/data/categories";
 
 const imagesArray = [
@@ -24,7 +25,7 @@ const CoverageStep = ({
           What kind of coverage do you need?
         </h2>
         <p className="text-slate-500">
-          Select a category to find  our licensed local agent.
+          Select a category to find our licensed local agent.
         </p>
       </div>
 
@@ -44,12 +45,13 @@ const CoverageStep = ({
               className="group cursor-pointer flex flex-col items-center gap-4 p-8 text-center border-2 border-slate-100 rounded-3xl hover:border-brand-gold hover:bg-slate-50 transition-all duration-300 hover:-translate-y-1"
             >
               <div className="relative w-16 h-16 group-hover:scale-110 transition-transform">
-                <img
+                <Image
                   src={imagesArray[index % imagesArray.length]}
                   alt={cat.name}
-                  // width={64}
-                  // height={64}
+                  width={64}
+                  height={64}
                   className="w-full h-full object-contain"
+                  priority={index < 3}
                 />
               </div>
               <div className="font-heading font-bold text-brand-navy text-lg group-hover:text-brand-gold transition-colors">
