@@ -76,7 +76,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {categories.map((cat) => (
+            {categories.map((cat, idx) => (
               <Link
                 key={cat.code}
                 href={`/find-agent?category=${cat.code}`}
@@ -90,6 +90,7 @@ export default function HomePage() {
                   width={64}
                   height={64}
                   className="w-16 h-16 mb-6 relative z-10"
+                  priority={idx < 3}
                 />
                 <div className="relative z-10">
                   <h3 className="font-heading font-bold text-2xl text-brand-navy mb-3 group-hover:text-brand-gold transition-colors">

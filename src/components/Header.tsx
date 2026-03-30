@@ -17,7 +17,13 @@ export default function Header() {
       <div className="max-w-6xl mx-auto px-6 flex items-center justify-between h-16">
         {/* Logo */}
         <Link href="/" className="flex flex-col no-underline group">
-          <Image src="/icons/header.png" alt="Logo" width={160} height={160} />
+          <Image
+            src="/icons/header.png"
+            alt="Logo"
+            width={160}
+            height={160}
+            priority
+          />
           <span className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.2em] -mt-1 ml-0.5">
             A Nationwide Insurance Marketplace
           </span>

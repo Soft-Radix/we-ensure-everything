@@ -1,10 +1,8 @@
 "use client";
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import CoverageStep from "@/components/agent/CoverageStep";
+import dynamic from "next/dynamic";
 import { Step } from "@/lib/data/categories";
-import UserDetailsStep from "@/components/agent/UserDetailsStep";
-import AgentResultStep from "@/components/agent/AgentResultStep";
 import {
   Agent,
   Category,
@@ -15,6 +13,34 @@ import {
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import StepIndicator from "@/components/agent/StepIndicator";
+
+const CoverageStep = dynamic(() => import("@/components/agent/CoverageStep"), {
+  loading: () => (
+    <div className="p-20 flex justify-center">
+      <div className="spinner" />
+    </div>
+  ),
+});
+const UserDetailsStep = dynamic(
+  () => import("@/components/agent/UserDetailsStep"),
+  {
+    loading: () => (
+      <div className="p-20 flex justify-center">
+        <div className="spinner" />
+      </div>
+    ),
+  },
+);
+const AgentResultStep = dynamic(
+  () => import("@/components/agent/AgentResultStep"),
+  {
+    loading: () => (
+      <div className="p-20 flex justify-center">
+        <div className="spinner" />
+      </div>
+    ),
+  },
+);
 
 const validationSchema = Yup.object({
   firstName: Yup.string().required("First name is required"),
@@ -50,23 +76,34 @@ function FindAgentContent() {
     message?: string;
   } | null>(null);
 
-  /* Load categories once */
+  /* Load categories and states once */
   useEffect(() => {
-    fetch("/api/categories")
-      .then((r) => r.json())
-      .then((d) => {
-        setCategories(d.categories || []);
+    const loadInitialData = async () => {
+      try {
+        const [catRes, stateRes] = await Promise.all([
+          fetch("/api/categories"),
+          fetch("/api/states"),
+        ]);
+
+        const [catData, stateData] = await Promise.all([
+          catRes.json(),
+          stateRes.json(),
+        ]);
+
+        const cats = catData.categories || [];
+        setCategories(cats);
+        setStates(stateData.states || []);
+
         if (initCategory) {
-          const found = (d.categories || []).find(
-            (c: Category) => c.code === initCategory,
-          );
+          const found = cats.find((c: Category) => c.code === initCategory);
           if (found) setSelectedCategory(found);
         }
-      });
+      } catch (error) {
+        console.error("Failed to load initial data", error);
+      }
+    };
 
-    fetch("/api/states")
-      .then((r) => r.json())
-      .then((d) => setStates(d.states || []));
+    loadInitialData();
   }, [initCategory]);
 
   /* Search counties */
