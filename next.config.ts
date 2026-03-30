@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
+  images: {
+    formats: ["image/avif", "image/webp"],
+  },
   webpack: (config, { isServer }) => {
     if (isServer) {
       // Sequelize pulls in drivers for every dialect at import time.

@@ -1,7 +1,11 @@
+import dynamic from "next/dynamic";
 import HeroBanner from "@/components/home/HeroBanner";
-import CoverageSection from "@/components/home/CoverageSection";
-import HowItWorks from "@/components/home/HowItWorks";
-import WhyTrust from "@/components/home/WhyTrust";
+
+const CoverageSection = dynamic(
+  () => import("@/components/home/CoverageSection"),
+);
+const HowItWorks = dynamic(() => import("@/components/home/HowItWorks"));
+const WhyTrust = dynamic(() => import("@/components/home/WhyTrust"));
 
 export default function HomePage() {
   return (

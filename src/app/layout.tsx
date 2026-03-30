@@ -1,19 +1,23 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
+import dynamic from "next/dynamic";
 import "./globals.css";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+
+const Footer = dynamic(() => import("@/components/Footer"));
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-body",
   display: "swap",
+  preload: true,
 });
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-heading",
   display: "swap",
+  preload: true,
 });
 
 export const metadata: Metadata = {
