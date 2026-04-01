@@ -5,7 +5,7 @@ const HowItWorks = () => {
   return (
     <section
       id="how-it-works"
-      className="py-24 md:py-32 bg-brand-navy text-white relative overflow-hidden"
+      className="relative py-24 md:py-32 bg-[url('/images/works.png')] bg-cover bg-center text-white overflow-hidden before:absolute before:inset-0 before:bg-black/50 before:z-0"
     >
       <div className="absolute top-1/2 left-0 w-96 h-96 bg-brand-gold/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
 
@@ -24,7 +24,7 @@ const HowItWorks = () => {
           {steps.map((s, i) => (
             <div key={s.step} className="text-center space-y-6">
               <div className="relative inline-block">
-                <div className="w-20 h-20 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center font-heading font-black text-3xl text-brand-gold mx-auto rotate-3 group-hover:rotate-0 transition-transform">
+                <div className="w-20 h-20 rounded-2xl bg-brand-gold border border-brand-navy flex items-center justify-center font-heading font-black text-3xl text-brand-navy mx-auto rotate-3 group-hover:rotate-0 transition-transform">
                   {s.step}
                 </div>
                 {i < steps.length - 1 && (
@@ -32,7 +32,7 @@ const HowItWorks = () => {
                 )}
               </div>
               <h3 className="text-2xl font-heading font-bold">{s.title}</h3>
-              <p className="text-white/60 leading-relaxed max-w-xs mx-auto">
+              <p className="text-white/80 leading-relaxed max-w-xs mx-auto">
                 {s.desc}
               </p>
             </div>
