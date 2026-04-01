@@ -1,4 +1,5 @@
 import { trustPoints } from "@/lib/data/static";
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
@@ -23,7 +24,15 @@ const WhyTrust = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
               {trustPoints.map((tp) => (
                 <div key={tp.title} className="flex flex-col gap-3">
-                  <span className="text-3xl">{tp.icon}</span>
+                  <span className="text-3xl">
+                    <Image
+                      src={tp.icon}
+                      alt={tp.title}
+                      width={500}
+                      height={500}
+                      className="object-cover rounded-2xl h-[150px] w-[400px]"
+                    />
+                  </span>
                   <h4 className="font-heading font-bold text-brand-navy text-xl">
                     {tp.title}
                   </h4>
@@ -40,7 +49,7 @@ const WhyTrust = () => {
             <div className="relative bg-white p-12 rounded-[2.5rem] shadow-2xl border border-slate-100">
               <div className="space-y-8">
                 <div className="flex items-center gap-4 border-b border-slate-100 pb-8">
-                  <div className="w-16 h-16 bg-brand-navy rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                  <div className="w-16 h-16 shrink-0 bg-brand-navy rounded-full flex items-center justify-center text-white text-2xl font-bold">
                     FL
                   </div>
                   <div>

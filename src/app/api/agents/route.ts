@@ -12,7 +12,7 @@ import {
 /* ──────────────────────────────────────────────────────────────
    POST /api/agents
    Onboard a new agent from webhook (n8n / GoHighLevel)
-   Body: { ghlUserId, firstName, lastName, email, phone,
+   Body: { ghlUserId, fullName, email, phone,state_abbr,county,
            licenseNo, licenseState, countyId, categoryCode, productCode }
 ────────────────────────────────────────────────────────────── */
 export async function POST(req: NextRequest) {

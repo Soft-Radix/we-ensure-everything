@@ -59,21 +59,21 @@ export const trustPoints = [
   {
     title: "Nationwide Coverage",
     desc: "Access to licensed agents in all 3,143 U.S. counties.",
-    icon: "🗺️",
+    icon: "/images/worldwide.jpg",
   },
   {
     title: "Licensed Agents Only",
     desc: "We only partner with vetted, state-licensed professionals.",
-    icon: "🏅",
+    icon: "/images/licensed-insurance-agent.png",
   },
   {
     title: "Multi-Carrier Options",
     desc: "Compare policies from top carriers to find the right fit.",
-    icon: "⚖️",
+    icon: "/images/multi.jpeg",
   },
   {
     title: "Secure & Instant",
     desc: "Your data is protected and matching happens in real-time.",
-    icon: "⚡",
+    icon: "/images/safe.jpg",
   },
 ];
