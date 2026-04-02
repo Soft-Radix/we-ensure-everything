@@ -17,7 +17,7 @@ module.exports = {
       "SELECT id, code, category_id FROM products",
     );
     const [agents] = await queryInterface.sequelize.query(
-      "SELECT id, ghl_user_id, state_abbr, county, category, product FROM agents WHERE status = 'active'",
+      "SELECT id, email FROM agents WHERE status = 'active'",
     );
     const [counties] = await queryInterface.sequelize.query(
       "SELECT id, name, state_abbr FROM counties",
@@ -32,21 +32,86 @@ module.exports = {
     const countyMap = Object.fromEntries(
       counties.map((c) => [`${c.state_abbr}_${c.name.toLowerCase()}`, c.id]),
     );
+    const agentMap = Object.fromEntries(agents.map((a) => [a.email, a.id]));
+
+    const demoAssignments = [
+      // Sarah Miller - Auto & Home in multiple counties
+      {
+        email: "sarah@agentpro-demo.com",
+        state: "CA",
+        county: "Los Angeles",
+        cat: "AUTO_VEHICLE",
+        prod: "AUTO",
+      },
+      {
+        email: "sarah@agentpro-demo.com",
+        state: "CA",
+        county: "Orange",
+        cat: "AUTO_VEHICLE",
+        prod: "AUTO",
+      },
+      {
+        email: "sarah@agentpro-demo.com",
+        state: "CA",
+        county: "Los Angeles",
+        cat: "PROPERTY_CASUALTY",
+        prod: "HOME",
+      },
+      // John Thompson - Health in multiple states (if county data exists)
+      {
+        email: "john@agentpro-demo.com",
+        state: "TX",
+        county: "Dallas",
+        cat: "HEALTH",
+        prod: "MEDICARE",
+      },
+      {
+        email: "john@agentpro-demo.com",
+        state: "TX",
+        county: "Tarrant",
+        cat: "HEALTH",
+        prod: "MEDICARE",
+      },
+      // Elena Rodriguez - Niche & Health
+      {
+        email: "elena@agentpro-demo.com",
+        state: "FL",
+        county: "Miami-Dade",
+        cat: "HEALTH",
+        prod: "GROUP_HEALTH",
+      },
+      {
+        email: "elena@agentpro-demo.com",
+        state: "FL",
+        county: "Miami-Dade",
+        cat: "NICHE_SPECIALTY",
+        prod: "TRAVEL",
+      },
+      // Cat Simmons (Active one)
+      {
+        email: "mikesimmons01@gmail.com",
+        state: "AR",
+        county: "Pulaski",
+        cat: "BUSINESS_COMMERCIAL",
+        prod: "BUILDERS_RISK",
+      },
+    ];
 
     const seatsToInsert = [];
 
-    for (const agent of agents) {
-      const catId = categoryMap[agent.category];
-      const prodId = productMap[`${catId}_${agent.product}`];
-      const countyKey = `${agent.state_abbr}_${agent.county.toLowerCase()}`;
+    for (const assign of demoAssignments) {
+      const agentId = agentMap[assign.email];
+      const catId = categoryMap[assign.cat];
+      const prodId = productMap[`${catId}_${assign.prod}`];
+      const countyKey = `${assign.state}_${assign.county.toLowerCase()}`;
       const countyId = countyMap[countyKey];
 
-      if (catId && prodId && countyId) {
+      if (agentId && catId && prodId && countyId) {
         seatsToInsert.push({
           county_id: countyId,
           category_id: catId,
           product_id: prodId,
-          agent_id: agent.id,
+          agent_id: agentId,
           status: "active",
           assigned_at: new Date(),
           created_at: new Date(),
@@ -55,8 +120,6 @@ module.exports = {
       }
     }
 
-    // Also add a few more seats for the demo agents in their specified counties
-    // to ensure they are "exclusive" for those products
     if (seatsToInsert.length > 0) {
       await queryInterface.bulkInsert("seats", seatsToInsert, {
         ignoreDuplicates: true,
