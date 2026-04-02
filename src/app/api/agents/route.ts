@@ -31,16 +31,20 @@ export async function POST(req: NextRequest) {
     phone?: string;
     licenseNo?: string;
     licenseState?: string;
+    bio?: string;
+    photoUrl?: string;
+    // Legacy single license fields
     countyId?: number;
     categoryCode?: string;
     productCode?: string;
-    bio?: string;
-    photoUrl?: string;
-    stateAbbr?: string;
-    countyName?: string;
-    categoryName?: string;
-    productName?: string;
+    // Multi-license support
+    licenses?: Array<{
+      countyId: number;
+      categoryCode: string;
+      productCode: string;
+    }>;
   };
+
   try {
     body = await req.json();
   } catch {
@@ -56,29 +60,32 @@ export async function POST(req: NextRequest) {
     phone,
     licenseNo,
     licenseState,
+    bio,
+    photoUrl,
     countyId,
     categoryCode,
     productCode,
-    bio,
-    photoUrl,
-    stateAbbr,
-    countyName,
-    categoryName,
-    productName,
+    licenses,
   } = body;
 
-  if (
-    (!fullName && (!firstName || !lastName)) ||
-    !email ||
-    !countyId ||
-    !categoryCode ||
-    !productCode
-  ) {
+  // Normalizing licenses into an array
+  const finalLicenses = [...(licenses || [])];
+  if (countyId && categoryCode && productCode) {
+    // Check if it's already in the array to avoid duplicates
+    const exists = finalLicenses.find(
+      (l) =>
+        l.countyId === countyId &&
+        l.categoryCode === categoryCode &&
+        l.productCode === productCode,
+    );
+    if (!exists) {
+      finalLicenses.push({ countyId, categoryCode, productCode });
+    }
+  }
+
+  if ((!fullName && (!firstName || !lastName)) || !email) {
     return NextResponse.json(
-      {
-        error:
-          "fullName (or firstName and lastName), email, countyId, categoryCode, productCode are required",
-      },
+      { error: "fullName (or firstName and lastName) and email are required" },
       { status: 400 },
     );
   }
@@ -89,49 +96,13 @@ export async function POST(req: NextRequest) {
     const finalFullName =
       fullName || `${firstName || ""} ${lastName || ""}`.trim();
 
-    if (!finalFullName) {
-      return NextResponse.json({ error: "Name is required" }, { status: 400 });
-    }
-
-    // 1. Resolve records
-    const countyRecord = await County.findByPk(countyId, { transaction: t });
-    const productRecord = await Product.findOne({
-      where: { code: productCode.toUpperCase() },
-      include: [
-        {
-          model: Category,
-          where: { code: categoryCode.toUpperCase() },
-          required: true,
-        },
-      ],
-      transaction: t,
-    });
-
-    if (!countyRecord || !productRecord) {
-      await t.rollback();
-      return NextResponse.json(
-        { error: "Invalid county, category or product" },
-        { status: 400 },
-      );
-    }
-
-    const { category_id: categoryId, id: productId } = productRecord;
-    const resolvedStateAbbr = stateAbbr || countyRecord.state_abbr;
-    const resolvedCounty = countyName || countyRecord.name;
-    const resolvedCategory = categoryName || productRecord.Category!.name;
-    const resolvedProduct = productName || productRecord.name;
-
-    // 2. Upsert agent with detailed fields
+    // 1. Upsert agent (profile only)
     const [agent] = await Agent.upsert(
       {
         ghl_user_id: ghlUserId || null,
         full_name: finalFullName,
         email,
         phone: phone || "",
-        state_abbr: resolvedStateAbbr,
-        county: resolvedCounty,
-        category: resolvedCategory,
-        product: resolvedProduct,
         license_no: licenseNo || null,
         license_state: licenseState || null,
         bio: bio || null,
@@ -141,69 +112,116 @@ export async function POST(req: NextRequest) {
       { transaction: t },
     );
 
-    // 3. Check if seat is available
-    const existingSeat = await Seat.findOne({
-      where: {
-        county_id: countyId,
-        category_id: categoryId,
-        product_id: productId,
-        status: "active",
-      },
-      transaction: t,
-    });
+    const routingResults = [];
 
-    let result: { status: string; message: string };
+    // 2. Process each license
+    for (const lic of finalLicenses) {
+      const {
+        countyId: licCountyId,
+        categoryCode: licCatCode,
+        productCode: licProdCode,
+      } = lic;
 
-    if (!existingSeat) {
-      // Seat is free → assign
-      await Seat.create(
-        {
-          county_id: countyId,
-          category_id: categoryId,
-          product_id: productId,
-          agent_id: agent.id,
-          status: "active",
-        },
-        { transaction: t },
-      );
-      result = {
-        status: "assigned",
-        message: "Agent assigned to seat successfully.",
-      };
-    } else {
-      // Seat occupied → waitlist
-      const maxPosition = await Waitlist.max<number, Waitlist>("position", {
+      const countyRecord = await County.findByPk(licCountyId, {
+        transaction: t,
+      });
+      const productRecord = await Product.findOne({
+        where: { code: licProdCode.toUpperCase() },
+        include: [
+          {
+            model: Category,
+            where: { code: licCatCode.toUpperCase() },
+            required: true,
+          },
+        ],
+        transaction: t,
+      });
+
+      if (!countyRecord || !productRecord) {
+        routingResults.push({
+          license: lic,
+          status: "error",
+          message: "Invalid county, category or product",
+        });
+        continue;
+      }
+
+      const { category_id: categoryId, id: productId } = productRecord;
+
+      // 3. Check if seat is available
+      const existingSeat = await Seat.findOne({
         where: {
-          county_id: countyId,
+          county_id: licCountyId,
           category_id: categoryId,
           product_id: productId,
-          status: "waiting",
+          status: "active",
         },
         transaction: t,
       });
 
-      const nextPosition = (maxPosition || 0) + 1;
+      if (!existingSeat) {
+        // Seat is free → assign
+        await Seat.create(
+          {
+            county_id: licCountyId,
+            category_id: categoryId,
+            product_id: productId,
+            agent_id: agent.id,
+            status: "active",
+          },
+          { transaction: t },
+        );
+        routingResults.push({
+          license: lic,
+          status: "assigned",
+          message: "Agent assigned to seat successfully.",
+        });
+      } else if (existingSeat.agent_id === agent.id) {
+        // Already assigned to this agent
+        routingResults.push({
+          license: lic,
+          status: "assigned",
+          message: "Agent already holds this seat.",
+        });
+      } else {
+        // Seat occupied → waitlist
+        const maxPosition = await Waitlist.max<number, Waitlist>("position", {
+          where: {
+            county_id: licCountyId,
+            category_id: categoryId,
+            product_id: productId,
+            status: "waiting",
+          },
+          transaction: t,
+        });
 
-      await Waitlist.upsert(
-        {
-          county_id: countyId,
-          category_id: categoryId,
-          product_id: productId,
-          agent_id: agent.id,
-          position: nextPosition,
-          status: "waiting",
-        },
-        { transaction: t },
-      );
+        const nextPosition = (maxPosition || 0) + 1;
 
-      result = {
-        status: "waitlisted",
-        message: `Seat is occupied. Agent added to waitlist at position ${nextPosition}.`,
-      };
+        await Waitlist.upsert(
+          {
+            county_id: licCountyId,
+            category_id: categoryId,
+            product_id: productId,
+            agent_id: agent.id,
+            position: nextPosition,
+            status: "waiting",
+          },
+          { transaction: t },
+        );
+
+        routingResults.push({
+          license: lic,
+          status: "waitlisted",
+          message: `Seat is occupied. Agent added to waitlist at position ${nextPosition}.`,
+        });
+      }
     }
 
     await t.commit();
-    return NextResponse.json({ ...result, agentId: agent.id });
+    return NextResponse.json({
+      agentId: agent.id,
+      results: routingResults,
+    });
   } catch (err) {
     if (t) await t.rollback();
     console.error("[API /agents POST] Error:", err);

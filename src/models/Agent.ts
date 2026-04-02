@@ -7,10 +7,6 @@ export interface AgentAttributes {
   full_name: string;
   email: string;
   phone: string;
-  state_abbr: string;
-  county: string;
-  category: string;
-  product: string;
   license_no?: string | null;
   license_state?: string | null;
   bio?: string | null;
@@ -35,10 +31,6 @@ class Agent
   public full_name!: string;
   public email!: string;
   public phone!: string;
-  public state_abbr!: string;
-  public county!: string;
-  public category!: string;
-  public product!: string;
   public license_no?: string | null;
   public license_state?: string | null;
   public bio?: string | null;
@@ -78,22 +70,6 @@ Agent.init(
       type: DataTypes.STRING(30),
       allowNull: false,
       unique: true,
-    },
-    state_abbr: {
-      type: DataTypes.CHAR(2),
-      allowNull: false,
-    },
-    county: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
-    },
-    category: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
-    },
-    product: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
     },
     license_no: {
       type: DataTypes.STRING(100),
