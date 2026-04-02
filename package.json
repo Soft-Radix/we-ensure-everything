@@ -14,8 +14,12 @@
     "db:seed": "sequelize-cli db:seed:all"
   },
   "dependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/uuid": "^10.0.0",
+    "bcryptjs": "^3.0.3",
     "formik": "^2.4.9",
+    "jose": "^6.2.2",
+    "lucide-react": "^1.7.0",
     "mysql2": "^3.20.0",
     "next": "16.1.7",
     "react": "19.2.3",
