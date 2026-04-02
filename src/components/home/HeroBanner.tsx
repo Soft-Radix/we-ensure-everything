@@ -3,7 +3,7 @@ import React from "react";
 
 const HeroBanner = () => {
   return (
-    <section className="relative overflow-hidden bg-[url('/images/hero.png')] bg-cover bg-center text-white overflow-hidden before:absolute before:inset-0 before:bg-black/20 before:z-0">
+    <section className="relative overflow-hidden bg-[url('/images/hero.png')] bg-cover bg-center text-white overflow-hidden before:absolute before:inset-0 before:bg-black/40 before:z-0">
       {/* Background elements */}
       <div className="absolute top-0 right-0 w-1/2 h-full bg-linear-to-l from-brand-gold/10 to-transparent pointer-events-none transform-gpu" />
       <div className="absolute -bottom-48 -left-48 w-96 h-96 rounded-full bg-brand-gold/5 blur-3xl pointer-events-none transform-gpu" />
