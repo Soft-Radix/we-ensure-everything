@@ -1,10 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
-import dynamic from "next/dynamic";
 import "./globals.css";
-import Header from "@/components/Header";
-
-const Footer = dynamic(() => import("@/components/Footer"));
 
 const inter = Inter({
   subsets: ["latin"],
@@ -45,11 +41,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
-      <body className="antialiased">
-        <Header />
-        {children}
-        <Footer />
-      </body>
+      <body className="antialiased font-sans">{children}</body>
     </html>
   );
 }

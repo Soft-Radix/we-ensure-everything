@@ -8,6 +8,7 @@ import {
   Seat,
   Waitlist,
 } from "@/models";
+import { Op } from "sequelize";
 
 /* ──────────────────────────────────────────────────────────────
    POST /api/agents
@@ -238,12 +239,18 @@ export async function GET(req: NextRequest) {
   const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
   const limit = Math.min(parseInt(searchParams.get("limit") || "20"), 100);
   const offset = (page - 1) * limit;
+  const search = searchParams.get("search") || "";
 
   try {
     const { count, rows } = await Agent.findAndCountAll({
       limit,
       offset,
       order: [["created_at", "DESC"]],
+      where: {
+        full_name: {
+          [Op.like]: `%${search}%`,
+        },
+      },
       // We can also include seats to get counts, but for simplicity:
       attributes: {
         include: [
