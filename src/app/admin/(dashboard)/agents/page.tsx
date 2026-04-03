@@ -48,10 +48,6 @@ export default function AgentsPage() {
     });
   }, [page, debouncedSearch, direction]);
 
-  if (loading) {
-    return <Loader />;
-  }
-
   return (
     <div className="space-y-10 animate-in fade-in duration-700">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -92,10 +88,10 @@ export default function AgentsPage() {
       </div>
 
       <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-[0_20px_60px_rgba(0,0,0,0.02)] overflow-hidden animate-in slide-in-from-bottom duration-1000">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto h-[calc(100vh-360px)]">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-100/50">
+              <tr className="bg-slate-50 border-b border-slate-100/50 sticky top-0 z-10">
                 <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
                   <div className="flex items-center gap-1.5 cursor-pointer hover:text-brand-navy transition-colors">
                     AGENT PROFILE{" "}
@@ -125,16 +121,14 @@ export default function AgentsPage() {
                 </th>
               </tr>
             </thead>
+
             <tbody className="divide-y divide-slate-50">
               {loading ? (
-                Array.from({ length: 5 }).map((_, i) => (
-                  <tr key={i} className="animate-pulse">
-                    <td
-                      colSpan={5}
-                      className="px-10 py-8 bg-slate-50/10 h-24"
-                    />
-                  </tr>
-                ))
+                <tr>
+                  <td colSpan={5}>
+                    <Loader varient="table" />
+                  </td>
+                </tr>
               ) : agents.length === 0 ? (
                 <tr>
                   <td
