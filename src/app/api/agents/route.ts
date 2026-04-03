@@ -9,6 +9,7 @@ import {
   Waitlist,
 } from "@/models";
 import { Op } from "sequelize";
+import { SortDirection } from "@/lib/enum";
 
 /* ──────────────────────────────────────────────────────────────
    POST /api/agents
@@ -240,12 +241,13 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(parseInt(searchParams.get("limit") || "20"), 100);
   const offset = (page - 1) * limit;
   const search = searchParams.get("search") || "";
+  const direction = searchParams.get("direction") || SortDirection.DESC;
 
   try {
     const { count, rows } = await Agent.findAndCountAll({
       limit,
       offset,
-      order: [["created_at", "DESC"]],
+      order: [["full_name", direction]],
       where: {
         full_name: {
           [Op.like]: `%${search}%`,

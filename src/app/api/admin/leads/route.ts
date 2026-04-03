@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Lead, County, Category, Product, Agent } from "@/models";
 import { Op } from "sequelize";
+import { SortDirection } from "@/lib/enum";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -8,12 +9,13 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(parseInt(searchParams.get("limit") || "20"), 100);
   const offset = (page - 1) * limit;
   const search = searchParams.get("search") || "";
+  const direction = searchParams.get("direction") || SortDirection.DESC;
 
   try {
     const { count, rows } = await Lead.findAndCountAll({
       limit,
       offset,
-      order: [["created_at", "DESC"]],
+      order: [["first_name", direction]],
       where: search
         ? {
             [Op.or]: [

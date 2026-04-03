@@ -16,6 +16,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useLoading } from "@/hooks/useLoading";
 import Loader from "@/components/admin/Loader";
 import Pagination from "@/components/admin/Pagination";
+import { SortDirection } from "@/lib/enum";
 
 interface Lead {
   id: string;
@@ -37,12 +38,13 @@ export default function UsersPage() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [search, setSearch] = useState("");
+  const [direction, setDirection] = useState<SortDirection>(SortDirection.ASC);
   const debouncedSearch = useDebounce(search, 500);
 
   useEffect(() => {
     withLoading(async () => {
       const res = await fetch(
-        `/api/admin/leads?page=${page}&limit=10&${debouncedSearch ? `search=${debouncedSearch}` : ""}`,
+        `/api/admin/leads?page=${page}&limit=10&${debouncedSearch ? `search=${debouncedSearch}` : ""}&direction=${direction}`,
       );
       if (res.ok) {
         const data = await res.json();
@@ -50,7 +52,7 @@ export default function UsersPage() {
         setTotal(data.total);
       }
     });
-  }, [page, debouncedSearch]);
+  }, [page, debouncedSearch, direction]);
 
   const getStatusStyle = (status: string) => {
     switch (status) {
@@ -121,7 +123,16 @@ export default function UsersPage() {
             <thead>
               <tr className="bg-slate-50 border-b border-slate-100/50">
                 <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                  <div className="flex items-center gap-1.5 hover:text-brand-navy transition-colors cursor-pointer">
+                  <div
+                    onClick={() =>
+                      setDirection(
+                        direction === SortDirection.DESC
+                          ? SortDirection.ASC
+                          : SortDirection.DESC,
+                      )
+                    }
+                    className="flex items-center gap-1.5 hover:text-brand-navy transition-colors cursor-pointer"
+                  >
                     USER PROFILE <ArrowUpDown className="w-3 h-3 opacity-50" />
                   </div>
                 </th>
