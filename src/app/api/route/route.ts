@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
 
     // ── 3. Resolve category & product IDs ────────────────────────
     const [catRows] = await conn.query<any[]>(
-      `SELECT c.id AS categoryId, p.id AS productId
+      `SELECT c.id AS categoryId, c.name AS categoryName, p.id AS productId, p.name AS productName
        FROM categories c
        JOIN products p ON p.category_id = c.id
        WHERE c.code = ? AND p.code = ? AND c.active = 1 AND p.active = 1
@@ -93,16 +93,18 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
-    const { categoryId, productId } = catRows[0];
+    const { categoryId, categoryName, productId, productName } = catRows[0];
 
     // ── 4. Validate county ───────────────────────────────────────
     const [countyRows] = await conn.query<any[]>(
-      `SELECT id FROM counties WHERE id = ? LIMIT 1`,
+      `SELECT name, state_abbr FROM counties WHERE id = ? LIMIT 1`,
       [countyId],
     );
     if (countyRows.length === 0) {
       return NextResponse.json({ error: "Invalid county ID" }, { status: 400 });
     }
+    const { name: countyName, state_abbr: stateAbbr } = countyRows[0];
+    const fullCountyDisplay = `${countyName} (${stateAbbr})`;
 
     // ── 5. Look up exclusive seat ────────────────────────────────
     const [seatRows] = await conn.query<any[]>(
@@ -120,6 +122,40 @@ export async function POST(req: NextRequest) {
 
     const leadId = randomUUID();
     const latencyMs = Date.now() - startTime;
+
+    // Helper for GHL Webhook
+    const sendToGHL = async (agentInfo: any = null) => {
+      const ghlWebhookUrl = process.env.GHL_WEBHOOK;
+      if (!ghlWebhookUrl) return;
+
+      const payload: any = {
+        name: `${firstName || ""} ${lastName || ""}`.trim(),
+        email: email || null,
+        phone: phone || null,
+        county: fullCountyDisplay,
+        category: categoryName,
+        product: productName,
+      };
+
+      if (agentInfo) {
+        payload.agent = {
+          name: agentInfo.full_name,
+          email: agentInfo.agentEmail,
+          phone: agentInfo.agentPhone,
+        };
+      }
+
+      try {
+        await fetch(ghlWebhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        console.log("✅ GHL Webhook triggered successfully!", payload);
+      } catch (err) {
+        console.error("❌ GHL Webhook failed:", err);
+      }
+    };
 
     // ── 6a. AGENT FOUND → assign ─────────────────────────────────
     if (seatRows.length > 0) {
@@ -158,6 +194,9 @@ export async function POST(req: NextRequest) {
           latencyMs,
         ],
       );
+
+      // Trigger GHL Webhook with Agent
+      await sendToGHL(agent);
 
       return NextResponse.json({
         status: "assigned",
@@ -200,6 +239,9 @@ export async function POST(req: NextRequest) {
        VALUES (?, 'NO_AGENT_FOUND', ?, 'success', ?)`,
       [leadId, JSON.stringify({ countyId, categoryId, productId }), latencyMs],
     );
+
+    // Trigger GHL Webhook without Agent
+    await sendToGHL();
 
     return NextResponse.json({
       status: "no_agent",
