@@ -13,6 +13,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useLoading } from "@/hooks/useLoading";
 import Pagination from "@/components/admin/Pagination";
 import { SortDirection } from "@/lib/enum";
+import Loader from "@/components/admin/Loader";
 
 interface Agent {
   id: number;
@@ -46,6 +47,10 @@ export default function AgentsPage() {
       }
     });
   }, [page, debouncedSearch, direction]);
+
+  if (loading) {
+    return <Loader />;
+  }
 
   return (
     <div className="space-y-10 animate-in fade-in duration-700">
