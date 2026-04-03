@@ -11,39 +11,51 @@ import {
   EyeOff,
   AlertCircle,
 } from "lucide-react";
+import * as Yup from "yup";
+import { useFormik } from "formik";
+
+const validationSchema = Yup.object({
+  email: Yup.string()
+    .required("Email is required")
+    .email("Enter a valid email address"),
+  password: Yup.string()
+    .required("Password is required")
+    .min(8, "Password must be at least 8 characters"),
+});
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+  const formik = useFormik({
+    initialValues: {
+      email: "",
+      password: "",
+    },
+    validationSchema,
+    onSubmit: async (values, { setSubmitting, setStatus }) => {
+      try {
+        const res = await fetch("/api/admin/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(values),
+        });
 
-    try {
-      const res = await fetch("/api/admin/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Login failed");
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Login failed");
-
-      router.push("/admin");
-      router.refresh();
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Login failed";
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
-  };
+        router.push("/admin");
+        router.refresh();
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "Login failed";
+        setStatus(message);
+      } finally {
+        setSubmitting(false);
+      }
+    },
+  });
+  const emailError = formik.touched.email && formik.errors.email;
+  const passwordError = formik.touched.password && formik.errors.password;
 
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 relative overflow-hidden font-sans">
@@ -67,58 +79,98 @@ export default function AdminLoginPage() {
             </p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-6">
-            {error && (
+          <form onSubmit={formik.handleSubmit} className="space-y-6">
+            {/* Server-side / submit error */}
+            {formik.status && (
               <div className="bg-red-500/10 border border-red-500/20 px-4 py-3 rounded-2xl flex items-center gap-3 animate-in slide-in-from-top-4 duration-300">
-                <AlertCircle className="w-4 h-4 text-red-400" />
+                <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
                 <span className="text-xs font-bold text-red-300 uppercase tracking-tight">
-                  {error}
+                  {formik.status}
                 </span>
               </div>
             )}
 
             <div className="space-y-4">
-              <div className="relative group">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-brand-gold transition-colors" />
-                <input
-                  type="text"
-                  placeholder="USERNAME"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="w-full bg-slate-800/50 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white text-xs font-bold focus:outline-none focus:border-brand-gold/30 focus:bg-slate-800 transition-all uppercase tracking-widest"
-                  required
-                />
+              <div className="space-y-1.5">
+                <div className="relative group">
+                  <User
+                    className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${
+                      emailError
+                        ? "text-red-400"
+                        : "text-slate-500 group-focus-within:text-brand-gold"
+                    }`}
+                  />
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="EMAIL"
+                    value={formik.values.email}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className={`w-full bg-slate-800/50 border rounded-2xl py-4 pl-12 pr-4 text-white text-xs font-bold focus:outline-none focus:bg-slate-800 transition-all tracking-widest ${
+                      emailError
+                        ? "border-red-500/40 focus:border-red-500/60"
+                        : "border-white/5 focus:border-brand-gold/30"
+                    }`}
+                  />
+                </div>
+                {emailError && (
+                  <p className="text-[10px] font-bold text-red-400 uppercase tracking-wider pl-4">
+                    {formik.errors.email}
+                  </p>
+                )}
               </div>
 
-              <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-brand-gold transition-colors" />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="PASSWORD"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-slate-800/50 border border-white/5 rounded-2xl py-4 pl-12 pr-12 text-white text-xs font-bold focus:outline-none focus:border-brand-gold/30 focus:bg-slate-800 transition-all uppercase tracking-widest"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-4 h-4" />
-                  ) : (
-                    <Eye className="w-4 h-4" />
-                  )}
-                </button>
+              <div className="space-y-1.5">
+                <div className="relative group">
+                  <Lock
+                    className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${
+                      passwordError
+                        ? "text-red-400"
+                        : "text-slate-500 group-focus-within:text-brand-gold"
+                    }`}
+                  />
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="PASSWORD"
+                    value={formik.values.password}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className={`w-full bg-slate-800/50 border rounded-2xl py-4 pl-12 pr-12 text-white text-xs font-bold focus:outline-none focus:bg-slate-800 transition-all tracking-widest ${
+                      passwordError
+                        ? "border-red-500/40 focus:border-red-500/60"
+                        : "border-white/5 focus:border-brand-gold/30"
+                    }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+                {passwordError && (
+                  <p className="text-[10px] font-bold text-red-400 uppercase tracking-wider pl-4">
+                    {formik.errors.password}
+                  </p>
+                )}
               </div>
             </div>
 
             <button
-              disabled={loading}
+              type="submit"
+              disabled={formik.isSubmitting}
               className="w-full bg-brand-gold hover:bg-yellow-500 text-slate-950 font-black py-4 rounded-2xl text-xs uppercase tracking-[0.2em] shadow-xl shadow-brand-gold/20 flex items-center justify-center gap-2 transition-all hover:-translate-y-1 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none group"
             >
-              {loading ? (
+              {formik.isSubmitting ? (
                 <Activity className="w-4 h-4 animate-spin text-slate-900" />
               ) : (
                 <>

@@ -12,6 +12,7 @@ import Image from "next/image";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useLoading } from "@/hooks/useLoading";
 import Pagination from "@/components/admin/Pagination";
+import { SortDirection } from "@/lib/enum";
 
 interface Agent {
   id: number;
@@ -30,12 +31,13 @@ export default function AgentsPage() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [search, setSearch] = useState("");
+  const [direction, setDirection] = useState<SortDirection>(SortDirection.ASC);
   const debouncedSearch = useDebounce(search, 500);
 
   useEffect(() => {
     withLoading(async () => {
       const res = await fetch(
-        `/api/agents?page=${page}&limit=10 ${debouncedSearch ? `&search=${debouncedSearch}` : ""}`,
+        `/api/agents?page=${page}&limit=10 ${debouncedSearch ? `&search=${debouncedSearch}` : ""} ${direction ? `&direction=${direction}` : ""}`,
       );
       if (res.ok) {
         const data = await res.json();
@@ -43,7 +45,7 @@ export default function AgentsPage() {
         setTotal(data.total);
       }
     });
-  }, [page, debouncedSearch]);
+  }, [page, debouncedSearch, direction]);
 
   return (
     <div className="space-y-10 animate-in fade-in duration-700">
@@ -91,7 +93,17 @@ export default function AgentsPage() {
               <tr className="bg-slate-50 border-b border-slate-100/50">
                 <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
                   <div className="flex items-center gap-1.5 cursor-pointer hover:text-brand-navy transition-colors">
-                    AGENT PROFILE <ArrowUpDown className="w-3 h-3 opacity-50" />
+                    AGENT PROFILE{" "}
+                    <ArrowUpDown
+                      onClick={() =>
+                        setDirection(
+                          direction === SortDirection.DESC
+                            ? SortDirection.ASC
+                            : SortDirection.DESC,
+                        )
+                      }
+                      className="w-3 h-3 opacity-50"
+                    />
                   </div>
                 </th>
                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
@@ -173,7 +185,7 @@ export default function AgentsPage() {
                       </div>
                     </td>
                     <td className="px-8 py-6 text-center">
-                      <span className="px-4 py-1.5 bg-brand-gold/5 text-brand-gold border border-brand-gold/10 rounded-full text-xs font-black shadow-[0_2px_8px_rgba(255,184,0,0.05)]">
+                      <span className="px-4 w-[100px] block py-1.5 bg-brand-gold/5 text-brand-gold border border-brand-gold/10 rounded-full text-xs font-black shadow-[0_2px_8px_rgba(255,184,0,0.05)]">
                         {agent.seat_count} ACTIVE
                       </span>
                     </td>

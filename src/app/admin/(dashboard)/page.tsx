@@ -154,9 +154,9 @@ export default function AdminDashboard() {
               {card.label}
             </p>
             <div className="flex items-baseline gap-2">
-              <h3 className="text-4xl font-black text-brand-navy tracking-tighter">
+              <span className="text-4xl font-black text-brand-navy tracking-tighter">
                 {card.value}
-              </h3>
+              </span>
               <span className="text-xs font-bold text-slate-300">Total</span>
             </div>
 
