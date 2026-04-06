@@ -9,16 +9,15 @@ module.exports = {
     // Clear existing agents
     await queryInterface.bulkDelete("agents", null, {});
 
+    // NOTE: state_abbr, county, category, product are removed by migration
+    // 20260401122631-remove-denormalized-fields-from-agents.js
+    // Agents are now linked to seats for coverage data.
     const agents = [
       {
         ghl_user_id: "ghl_001",
         full_name: "Brandon Elliott",
         email: "brandon@insureboost.com",
         phone: "3214503600",
-        state_abbr: "FL",
-        county: "General",
-        category: "HEALTH",
-        product: "HEALTH",
         status: "inactive",
       },
       {
@@ -26,10 +25,6 @@ module.exports = {
         full_name: "Corey Jermaine Jackson",
         email: "coreyjackson12@gmail.com",
         phone: "8133594949",
-        state_abbr: "FL",
-        county: "General",
-        category: "LIFE_DISABILITY",
-        product: "LIFE",
         status: "inactive",
       },
       {
@@ -37,10 +32,6 @@ module.exports = {
         full_name: "Cynthia Rodriguez",
         email: "cynthia.rodriguez@simplifiedhealthcaresolution.com",
         phone: "2158691422",
-        state_abbr: "FL",
-        county: "General",
-        category: "HEALTH",
-        product: "MEDICARE",
         status: "inactive",
       },
       {
@@ -48,10 +39,6 @@ module.exports = {
         full_name: "Greg Roe",
         email: "greg@roeins.com",
         phone: "8132638715",
-        state_abbr: "FL",
-        county: "General",
-        category: "BUSINESS_COMMERCIAL",
-        product: "COMMERCIAL",
         status: "inactive",
       },
       {
@@ -59,10 +46,6 @@ module.exports = {
         full_name: "James Sebest",
         email: "james@john-galt.com",
         phone: "9542143751",
-        state_abbr: "FL",
-        county: "General",
-        category: "BUSINESS_COMMERCIAL",
-        product: "COMMERCIAL",
         status: "inactive",
       },
       {
@@ -70,10 +53,6 @@ module.exports = {
         full_name: "Joseph Menachem",
         email: "joseph@markerinsurance.com",
         phone: "9544567505",
-        state_abbr: "FL",
-        county: "General",
-        category: "BUSINESS_COMMERCIAL",
-        product: "MARINE",
         status: "inactive",
       },
       {
@@ -81,10 +60,6 @@ module.exports = {
         full_name: "Ken Tolchin",
         email: "ken@practicalinsurancesolutions.com",
         phone: "5612128092",
-        state_abbr: "FL",
-        county: "General",
-        category: "LIFE_DISABILITY",
-        product: "ANNUITIES",
         status: "inactive",
       },
       {
@@ -92,10 +67,6 @@ module.exports = {
         full_name: "Paul Vawrock",
         email: "paul@vawrock.com",
         phone: "8139291150",
-        state_abbr: "FL",
-        county: "Pasco",
-        category: "HEALTH",
-        product: "HEALTH",
         status: "inactive",
       },
       {
@@ -103,10 +74,6 @@ module.exports = {
         full_name: "saurabhinfinite",
         email: "sb@infiniteinsuranceusa.com",
         phone: "9549870100",
-        state_abbr: "FL",
-        county: "General",
-        category: "AUTO_VEHICLE",
-        product: "AUTO",
         status: "inactive",
       },
       {
@@ -114,10 +81,6 @@ module.exports = {
         full_name: "Shamir Montealegre",
         email: "info@helloinsuranceagents.com",
         phone: "9546620662",
-        state_abbr: "FL",
-        county: "General",
-        category: "AUTO_VEHICLE",
-        product: "AUTO",
         status: "inactive",
       },
       {
@@ -125,10 +88,6 @@ module.exports = {
         full_name: "Brandon Rapose",
         email: "coveragewithbrandon@gmail.com",
         phone: "4842744257",
-        state_abbr: "FL",
-        county: "General",
-        category: "HEALTH",
-        product: "HEALTH",
         status: "inactive",
       },
       {
@@ -136,10 +95,6 @@ module.exports = {
         full_name: "Mikell Simmons",
         email: "mike@weinsureeverything.com",
         phone: "9544054015",
-        state_abbr: "FL",
-        county: "General",
-        category: "HEALTH",
-        product: "HEALTH",
         status: "inactive",
       },
       {
@@ -147,10 +102,6 @@ module.exports = {
         full_name: "Kenneth Bryant",
         email: "kenneth.bryant@kbagencygroup.com",
         phone: "4077150906",
-        state_abbr: "FL",
-        county: "General",
-        category: "LIFE_DISABILITY",
-        product: "LIFE",
         status: "inactive",
       },
       {
@@ -158,10 +109,6 @@ module.exports = {
         full_name: "Rosalyn Jones",
         email: "rosalyn@rljones.com",
         phone: "3526423274",
-        state_abbr: "FL",
-        county: "Alachua",
-        category: "HEALTH",
-        product: "MEDICARE",
         status: "inactive",
       },
       {
@@ -169,10 +116,6 @@ module.exports = {
         full_name: "Alex Brito",
         email: "alex@singlepointes.com",
         phone: "7862500016",
-        state_abbr: "FL",
-        county: "Miami-Dade",
-        category: "HEALTH",
-        product: "GROUP_VOLUNTARY",
         status: "inactive",
       },
       {
@@ -180,10 +123,6 @@ module.exports = {
         full_name: "Imtiyaz Mavani",
         email: "infinityinsurance2@gmail.com",
         phone: "14692269495",
-        state_abbr: "TX",
-        county: "General",
-        category: "PROPERTY_CASUALTY",
-        product: "HOME",
         status: "inactive",
       },
       {
@@ -191,10 +130,6 @@ module.exports = {
         full_name: "Cat Simmons",
         email: "mikesimmons01@gmail.com",
         phone: "19544054015",
-        state_abbr: "AR",
-        county: "Pulaski",
-        category: "BUSINESS_COMMERCIAL",
-        product: "BUILDERS_RISK",
         status: "active",
       },
       {
@@ -202,10 +137,6 @@ module.exports = {
         full_name: "John Adams",
         email: "jadams@test.com",
         phone: "13055555555",
-        state_abbr: "IN",
-        county: "Marion",
-        category: "AUTO_VEHICLE",
-        product: "AUTO",
         status: "active",
       },
       {
@@ -213,10 +144,6 @@ module.exports = {
         full_name: "Kamal Jones",
         email: "kjones@test.com",
         phone: "19545555555",
-        state_abbr: "AK",
-        county: "Anchorage",
-        category: "PROPERTY_CASUALTY",
-        product: "HOME",
         status: "active",
       },
     ];
