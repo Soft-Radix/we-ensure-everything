@@ -149,22 +149,6 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
-      state_abbr: {
-        type: Sequelize.CHAR(2),
-        allowNull: true,
-      },
-      county: {
-        type: Sequelize.STRING(100),
-        allowNull: true,
-      },
-      category: {
-        type: Sequelize.STRING(100),
-        allowNull: true,
-      },
-      product: {
-        type: Sequelize.STRING(100),
-        allowNull: true,
-      },
       license_no: {
         type: Sequelize.STRING(100),
       },
