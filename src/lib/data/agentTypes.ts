@@ -28,3 +28,11 @@ export interface Agent {
   licenseState?: string;
 }
 export type RoutingStatus = "assigned" | "no_agent" | "duplicate" | null;
+export interface MultiSelectProps {
+  label: string;
+  options: { label: string; value: string }[];
+  selected: string[];
+  onChange: (selected: string[]) => void;
+  error?: string;
+  placeholder?: string;
+}

@@ -9,6 +9,14 @@ export interface AgentAttributes {
   phone: string;
   license_no?: string | null;
   license_state?: string | null;
+  business_name?: string | null;
+  business_website?: string | null;
+  street_address?: string | null;
+  city?: string | null;
+  state?: string | null;
+  country?: string | null;
+  postal_code?: string | null;
+  district?: string | null;
   bio?: string | null;
   photo_url?: string | null;
   website_url?: string | null;
@@ -33,6 +41,14 @@ class Agent
   public phone!: string;
   public license_no?: string | null;
   public license_state?: string | null;
+  public business_name?: string | null;
+  public business_website?: string | null;
+  public street_address?: string | null;
+  public city?: string | null;
+  public state?: string | null;
+  public country?: string | null;
+  public postal_code?: string | null;
+  public district?: string | null;
   public bio?: string | null;
   public photo_url?: string | null;
   public website_url?: string | null;
@@ -77,6 +93,38 @@ Agent.init(
     },
     license_state: {
       type: DataTypes.CHAR(2),
+      allowNull: true,
+    },
+    business_name: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    business_website: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
+    },
+    street_address: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    city: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    state: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    country: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    postal_code: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
+    },
+    district: {
+      type: DataTypes.STRING(100),
       allowNull: true,
     },
     bio: {

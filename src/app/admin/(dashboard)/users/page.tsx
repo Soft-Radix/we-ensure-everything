@@ -2,8 +2,6 @@
 import { useEffect, useState } from "react";
 import {
   Search,
-  ChevronLeft,
-  ChevronRight,
   Mail,
   MapPin,
   Calendar,
