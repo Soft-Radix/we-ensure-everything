@@ -68,6 +68,7 @@ function FindAgentContent() {
   );
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
+  const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(false);
   const [routingResult, setRoutingResult] = useState<{
     status: RoutingStatus;
@@ -76,23 +77,26 @@ function FindAgentContent() {
     message?: string;
   } | null>(null);
 
-  /* Load categories and states once */
+  /* Load categories, states, and agents once */
   useEffect(() => {
     const loadInitialData = async () => {
       try {
-        const [catRes, stateRes] = await Promise.all([
+        const [catRes, stateRes, agentRes] = await Promise.all([
           fetch("/api/categories"),
           fetch("/api/states"),
+          fetch("/api/agents?limit=100"), // Load some agents for referral
         ]);
 
-        const [catData, stateData] = await Promise.all([
+        const [catData, stateData, agentData] = await Promise.all([
           catRes.json(),
           stateRes.json(),
+          agentRes.json(),
         ]);
 
         const cats = catData.categories || [];
         setCategories(cats);
         setStates(stateData.states || []);
+        setAgents(agentData.agents || []);
 
         if (initCategory) {
           const found = cats.find((c: Category) => c.code === initCategory);
@@ -144,6 +148,7 @@ function FindAgentContent() {
       lastName: "",
       email: "",
       phone: "",
+      referredBy: "",
     },
     validationSchema,
     onSubmit: async (values) => {
@@ -249,6 +254,7 @@ function FindAgentContent() {
               states={states}
               selectedState={selectedState}
               setSelectedState={setSelectedState}
+              agents={agents}
             />
           )}
 

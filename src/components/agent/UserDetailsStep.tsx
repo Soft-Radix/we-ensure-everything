@@ -17,6 +17,7 @@ const UserDetailsStep = ({
   states,
   selectedState,
   setSelectedState,
+  agents,
 }: any) => {
   return (
     <div className="p-10 md:p-10 animate-fade-in">
@@ -244,6 +245,32 @@ const UserDetailsStep = ({
                 )}
               </div>
             ))}
+
+            <div>
+              <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2">
+                Referred By (Optional)
+              </label>
+              <select
+                name="referredBy"
+                value={formik.values.referredBy}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-lg outline-none focus:border-brand-gold transition-all appearance-none cursor-pointer"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "right 1.5rem center",
+                  backgroundSize: "1.5rem",
+                }}
+              >
+                <option value="">Select Agent (if applicable)</option>
+                {agents.map((agent: any) => (
+                  <option key={agent.id} value={agent.id}>
+                    {agent.full_name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <button
@@ -255,9 +282,9 @@ const UserDetailsStep = ({
           </button>
 
           <p className="text-[10px] text-slate-400 text-center leading-relaxed">
-            By clicking &quot;Meet Your Local Agent&quot;, you agree to our terms.
-            Your information is protected and will only be shared with your
-            licensed local professional.
+            By clicking &quot;Meet Your Local Agent&quot;, you agree to our
+            terms. Your information is protected and will only be shared with
+            your licensed local professional.
           </p>
         </div>
       </div>

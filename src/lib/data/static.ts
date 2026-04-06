@@ -77,3 +77,25 @@ export const trustPoints = [
     icon: "/images/safe.jpg",
   },
 ];
+
+export const currentStepInfo = (step: number) => {
+  switch (step) {
+    case 1:
+      return {
+        title: "Agent Credentials",
+        sub: "Tell us about your licenses and expertise",
+      };
+    case 2:
+      return {
+        title: "Business Address",
+        sub: "Where is your primary office located?",
+      };
+    case 3:
+      return {
+        title: "General Information",
+        sub: "Finalize your professional profile",
+      };
+    default:
+      return { title: "", sub: "" };
+  }
+};

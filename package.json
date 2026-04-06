@@ -8,10 +8,11 @@
     "start": "next start",
     "lint": "eslint",
     "seed:counties": "node database/seed-counties.js",
-    "db:schema": "mysql -u admin -padmin123 < database/schema.sql",
+    "db:init": "node scripts/init-db.js",
     "db:migrate": "sequelize-cli db:migrate",
     "db:migrate:undo": "sequelize-cli db:migrate:undo",
-    "db:seed": "sequelize-cli db:seed:all"
+    "db:seed": "sequelize-cli db:seed:all",
+    "db:setup": "npm run db:init && npm run db:migrate && npm run db:seed"
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",
@@ -24,6 +25,7 @@
     "next": "16.1.7",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-hot-toast": "^2.6.0",
     "sequelize": "^6.37.8",
     "sequelize-cli": "^6.6.5",
     "uuid": "^13.0.0",

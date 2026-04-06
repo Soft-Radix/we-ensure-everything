@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
     email?: string;
     phone?: string;
     source?: string;
+    referredBy?: number;
   };
 
   try {
@@ -37,6 +38,7 @@ export async function POST(req: NextRequest) {
     email,
     phone,
     source = "website",
+    referredBy,
   } = body;
 
   // ── 1. Input validation ──────────────────────────────────────
@@ -135,6 +137,7 @@ export async function POST(req: NextRequest) {
         county: fullCountyDisplay,
         category: categoryName,
         product: productName,
+        referred_by: referredBy || null,
       };
 
       if (agentInfo) {
@@ -164,8 +167,8 @@ export async function POST(req: NextRequest) {
       await conn.query(
         `INSERT INTO leads (id, county_id, category_id, product_id,
            first_name, last_name, email, phone,
-           assigned_agent_id, routing_status, source, routed_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'assigned', ?, NOW())`,
+           assigned_agent_id, routing_status, source, referred_by_agent_id, routed_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'assigned', ?, ?, NOW())`,
         [
           leadId,
           countyId,
@@ -177,6 +180,7 @@ export async function POST(req: NextRequest) {
           phone || null,
           agent.agentId,
           source,
+          referredBy || null,
         ],
       );
 
@@ -219,8 +223,8 @@ export async function POST(req: NextRequest) {
     await conn.query(
       `INSERT INTO leads (id, county_id, category_id, product_id,
          first_name, last_name, email, phone,
-         routing_status, source, routed_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'no_agent', ?, NOW())`,
+         routing_status, source, referred_by_agent_id, routed_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'no_agent', ?, ?, NOW())`,
       [
         leadId,
         countyId,
@@ -231,6 +235,7 @@ export async function POST(req: NextRequest) {
         email || null,
         phone || null,
         source,
+        referredBy || null,
       ],
     );
 

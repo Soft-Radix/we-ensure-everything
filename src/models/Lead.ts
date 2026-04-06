@@ -15,6 +15,7 @@ export interface LeadAttributes {
   email?: string | null;
   phone?: string | null;
   assigned_agent_id?: number | null;
+  referred_by_agent_id?: number | null;
   routing_status: "assigned" | "no_agent" | "waitlisted" | "error";
   ghl_contact_id?: string | null;
   ghl_pipeline_id?: string | null;
@@ -31,6 +32,7 @@ export interface LeadCreationAttributes extends Optional<
   | "email"
   | "phone"
   | "assigned_agent_id"
+  | "referred_by_agent_id"
   | "ghl_contact_id"
   | "ghl_pipeline_id"
   | "idempotency_key"
@@ -52,6 +54,7 @@ class Lead
   public email?: string | null;
   public phone?: string | null;
   public assigned_agent_id?: number | null;
+  public referred_by_agent_id?: number | null;
   public routing_status!: "assigned" | "no_agent" | "waitlisted" | "error";
   public ghl_contact_id?: string | null;
   public ghl_pipeline_id?: string | null;
@@ -101,6 +104,10 @@ Lead.init(
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: true,
     },
+    referred_by_agent_id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: true,
+    },
     routing_status: {
       type: DataTypes.ENUM("assigned", "no_agent", "waitlisted", "error"),
       allowNull: false,
@@ -147,5 +154,6 @@ Lead.belongsTo(County, { foreignKey: "county_id" });
 Lead.belongsTo(Category, { foreignKey: "category_id" });
 Lead.belongsTo(Product, { foreignKey: "product_id" });
 Lead.belongsTo(Agent, { foreignKey: "assigned_agent_id" });
+Lead.belongsTo(Agent, { as: "referrer", foreignKey: "referred_by_agent_id" });
 
 export default Lead;

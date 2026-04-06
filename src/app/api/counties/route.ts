@@ -5,8 +5,8 @@ import { County } from "@/models";
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const q = searchParams.get("q") || "";
-  const state = searchParams.get("state") || "";
-  const limit = Math.min(parseInt(searchParams.get("limit") || "50"), 100);
+  const state = searchParams.get("state") || searchParams.get("states") || "";
+  const limit = Math.min(parseInt(searchParams.get("limit") || "50"), 3000);
 
   try {
     const where: Record<string, unknown> = {};
@@ -15,7 +15,12 @@ export async function GET(req: NextRequest) {
       where.name = { [Op.like]: `%${q}%` };
     }
     if (state) {
-      where.state_abbr = state.toUpperCase();
+      const states = state.split(",").map((s) => s.trim().toUpperCase());
+      if (states.length > 1) {
+        where.state_abbr = { [Op.in]: states };
+      } else {
+        where.state_abbr = states[0];
+      }
     }
 
     const counties = await County.findAll({
