@@ -36,3 +36,11 @@ export interface MultiSelectProps {
   error?: string;
   placeholder?: string;
 }
+export interface SingleSelectProps {
+  label: string;
+  options: { label: string; value: string }[];
+  value: string;
+  onChange: (value: string) => void;
+  error?: string;
+  placeholder?: string;
+}

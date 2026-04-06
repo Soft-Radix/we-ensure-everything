@@ -110,10 +110,11 @@ function FindAgentContent() {
     loadInitialData();
   }, [initCategory]);
 
-  /* Search counties */
+  /* Search counties by text (debounced) */
   useEffect(() => {
     if (countySearch.length < 2) {
-      setCounties([]);
+      // Don't clear if we have a state selected (state-fetch will handle it)
+      if (!selectedState || selectedState.code === "ALL") setCounties([]);
       return;
     }
     const timer = setTimeout(() => {
@@ -129,6 +130,17 @@ function FindAgentContent() {
     }, 280);
     return () => clearTimeout(timer);
   }, [countySearch, selectedState]);
+
+  /* Pre-load all counties when a state is selected */
+  useEffect(() => {
+    if (!selectedState || selectedState.code === "ALL") {
+      setCounties([]);
+      return;
+    }
+    fetch(`/api/counties?state=${selectedState.code}&limit=200`)
+      .then((r) => r.json())
+      .then((d) => setCounties(d.counties || []));
+  }, [selectedState]);
 
   /* Load products when category selected */
   useEffect(() => {
