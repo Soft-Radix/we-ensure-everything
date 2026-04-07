@@ -1,5 +1,6 @@
 import React from "react";
 import SingleSelect from "@/components/agent/SingleSelect";
+import { Mail, Phone, User } from "lucide-react";
 
 const UserDetailsStep = ({
   setStep,
@@ -129,22 +130,26 @@ const UserDetailsStep = ({
                 id: "firstName",
                 label: "First Name",
                 placeholder: "John",
+                icon: <User className="w-5 h-5" />,
               },
               {
                 id: "lastName",
                 label: "Last Name",
                 placeholder: "Smith",
+                icon: <User className="w-5 h-5" />,
               },
               {
                 id: "email",
                 label: "Email",
                 placeholder: "john@example.com",
+                icon: <Mail className="w-5 h-5" />,
                 type: "email",
               },
               {
                 id: "phone",
                 label: "Phone",
                 placeholder: "(555) 000-0000",
+                icon: <Phone className="w-5 h-5" />,
                 type: "tel",
               },
             ].map((field) => (
@@ -155,16 +160,24 @@ const UserDetailsStep = ({
                     <span className="text-red-400">*</span>
                   )}
                 </label>
-                <input
-                  type={field.type || "text"}
-                  name={field.id}
-                  value={formik.values[field.id]}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  placeholder={field.placeholder}
-                  className={`w-full px-6 py-3  border rounded-2xl outline-none transition-all
+
+                <div className="relative">
+                  {field.icon && (
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                      {field.icon}
+                    </div>
+                  )}
+                  <input
+                    type={field.type || "text"}
+                    name={field.id}
+                    value={formik.values[field.id]}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    placeholder={field.placeholder}
+                    className={`w-full pl-12 pr-4 py-4  border border-slate-200 rounded-2xl outline-none transition-all
                             ${formik.touched[field.id] && formik.errors[field.id] ? "border-red-400 focus:border-red-500" : "border-slate-100 focus:border-brand-gold"}`}
-                />
+                  />
+                </div>
                 {formik.touched[field.id] && formik.errors[field.id] && (
                   <p className="text-red-500 text-xs mt-1">
                     {formik.errors[field.id]}

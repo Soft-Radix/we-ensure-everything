@@ -75,7 +75,7 @@ const SingleSelect = ({
           if (e.key === "Enter" || e.key === " ") handleOpen();
           if (e.key === "Escape") setIsOpen(false);
         }}
-        className={`min-h-[50px] pr-3 pl-6 py-2 border rounded-xl bg-white flex items-center justify-between gap-2 cursor-pointer transition-all select-none ${
+        className={`min-h-[50px] pr-3 pl-4 py-4 border rounded-xl bg-white flex items-center justify-between gap-2 cursor-pointer transition-all select-none ${
           isOpen
             ? "ring-2 ring-brand-gold border-brand-gold"
             : "border-slate-200 hover:border-slate-300"
