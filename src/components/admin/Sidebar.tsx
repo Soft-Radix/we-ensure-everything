@@ -12,11 +12,12 @@ import {
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useLoading } from "@/hooks/useLoading";
+import { adminRoute } from "@/lib/data/static";
 
 const menuItems = [
-  { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { label: "Users (Leads)", href: "/admin/users", icon: Users },
-  { label: "Agents", href: "/admin/agents", icon: UserSquare2 },
+  { label: "Dashboard", href: adminRoute, icon: LayoutDashboard },
+  { label: "Users (Leads)", href: `${adminRoute}/users`, icon: Users },
+  { label: "Agents", href: `${adminRoute}/agents`, icon: UserSquare2 },
   //   { label: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
@@ -29,7 +30,7 @@ export default function Sidebar() {
     await withLoading(async () => {
       const res = await fetch("/api/admin/auth/logout", { method: "POST" });
       if (res.ok) {
-        router.push("/admin/login");
+        router.push(`${adminRoute}/login`);
         router.refresh();
       }
     });

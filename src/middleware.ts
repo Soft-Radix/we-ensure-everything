@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { decrypt, COOKIE_NAME } from "@/lib/auth";
+import { adminRoute } from "@/lib/data/static";
 
-const PUBLIC_ADMIN_ROUTES = ["/admin/login"];
+const PUBLIC_ADMIN_ROUTES = [adminRoute + "/login"];
 const AD_MIN_API_PREFIX = "/api/admin";
 
 export default async function middleware(request: NextRequest) {
@@ -9,7 +10,7 @@ export default async function middleware(request: NextRequest) {
 
   // 1. Skip non-admin routes
   if (
-    !pathname.startsWith("/admin") &&
+    !pathname.startsWith(adminRoute) &&
     !pathname.startsWith(AD_MIN_API_PREFIX)
   ) {
     return NextResponse.next();
@@ -30,7 +31,7 @@ export default async function middleware(request: NextRequest) {
     if (pathname.startsWith(AD_MIN_API_PREFIX)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    return NextResponse.redirect(new URL("/admin/login", request.url));
+    return NextResponse.redirect(new URL(adminRoute + "/login", request.url));
   }
 
   try {
@@ -41,7 +42,9 @@ export default async function middleware(request: NextRequest) {
       if (pathname.startsWith(AD_MIN_API_PREFIX)) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
-      return NextResponse.redirect(new URL("/?error=forbidden", request.url));
+      return NextResponse.redirect(
+        new URL(adminRoute + "/login?error=forbidden", request.url),
+      );
     }
 
     const response = NextResponse.next();
@@ -52,11 +55,11 @@ export default async function middleware(request: NextRequest) {
       return NextResponse.json({ error: "Invalid Session" }, { status: 401 });
     }
     return NextResponse.redirect(
-      new URL("/admin/login?error=invalid_session", request.url),
+      new URL(adminRoute + "/login?error=invalid_session", request.url),
     );
   }
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/admin/:path*"],
+  matcher: [adminRoute + "/:path*", "/api/admin/:path*"],
 };

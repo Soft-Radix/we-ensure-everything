@@ -5,7 +5,9 @@ import * as Yup from "yup";
 export const step1Schema = Yup.object().shape({
   fullName: Yup.string().required("Full name is required"),
   email: Yup.string().email("Invalid email").required("Email is required"),
-  phone: Yup.string().required("Phone is required"),
+  phone: Yup.string()
+    .required("Phone is required")
+    .matches(/^[0-9]{10}$/, "Phone number must be 10 digits"),
   selectedStates: Yup.array()
     .min(1, "Select at least one state")
     .required("Required"),
@@ -23,10 +25,14 @@ export const step1Schema = Yup.object().shape({
 
 export const step2Schema = Yup.object().shape({
   streetAddress: Yup.string().required("Street address is required"),
-  city: Yup.string().optional(),
-  state: Yup.string().optional(),
-  country: Yup.string().optional(),
-  postalCode: Yup.string().optional(),
+  // city: Yup.string().optional(),
+  // state: Yup.string().optional(),
+  // country: Yup.string().optional(),
+  // postalCode: Yup.string().optional(),
+  city: Yup.string().required("City is required"),
+  state: Yup.string().required("State is required"),
+  country: Yup.string().required("Country is required"),
+  postalCode: Yup.string().required("Postal code is required"),
 });
 
 export const step3Schema = Yup.object().shape({

@@ -60,7 +60,12 @@ export default function AddAgentPage() {
     validationSchema:
       step === 1 ? step1Schema : step === 2 ? step2Schema : step3Schema,
     onSubmit: async (values) => {
-      if (step < 3) {
+      if (step === 1) {
+        setLoading(true);
+        const unique = await isNewAgent();
+        setLoading(false);
+        if (!unique) return;
+      } else if (step < 3) {
         setStep(step + 1);
       } else {
         setLoading(true);
@@ -166,6 +171,34 @@ export default function AddAgentPage() {
 
   const handlePrev = () => {
     if (step > 1) setStep(step - 1);
+  };
+
+  const isNewAgent = async () => {
+    if (!step1Schema.isValidSync(formik.values)) {
+      return false;
+    }
+    try {
+      const res = await fetch("/api/agents/exiting", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formik.values.email,
+          phone: formik.values.phone,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setStep(2);
+        return true;
+      } else {
+        toast.error(data.error);
+        return false;
+      }
+    } catch (err) {
+      toast.error("Error fetching agent status");
+      console.error("Error fetching agent status", err);
+      return false;
+    }
   };
 
   return (
@@ -365,7 +398,7 @@ export default function AddAgentPage() {
               {/* STEP 2: BUSINESS ADDRESS */}
               {step === 2 && (
                 <div className="space-y-6">
-                  <div>
+                  {/* <div>
                     <label className="block text-slate-700 font-semibold mb-2 text-sm">
                       Address
                     </label>
@@ -374,7 +407,7 @@ export default function AddAgentPage() {
                       placeholder="Search for your business address..."
                       className=" w-full p-4 rounded-xl border border-slate-200 focus:border-brand-gold bg-white outline-none"
                     />
-                  </div>
+                  </div> */}
 
                   <div className="mb-6">
                     <label className="block text-slate-700 font-semibold mb-2 text-sm">
@@ -396,43 +429,64 @@ export default function AddAgentPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-slate-700 font-semibold mb-2 text-sm">
-                        City (Optional)
+                        City *
                       </label>
                       <input
                         className="w-full px-6 py-4 rounded-xl border border-slate-200 focus:border-brand-gold focus:ring-4 focus:ring-brand-gold/10 transition-all outline-none"
                         placeholder="New York"
                         {...formik.getFieldProps("city")}
                       />
+                      {formik.touched.city && formik.errors.city && (
+                        <p className="text-red-500 text-xs mt-1 absolute">
+                          {formik.errors.city}
+                        </p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-slate-700 font-semibold mb-2 text-sm">
-                        State (Optional)
+                        State *
                       </label>
                       <input
                         className="w-full px-6 py-4 rounded-xl border border-slate-200 focus:border-brand-gold focus:ring-4 focus:ring-brand-gold/10 transition-all outline-none"
                         placeholder="NY"
                         {...formik.getFieldProps("state")}
                       />
+                      {formik.touched.state && formik.errors.state && (
+                        <p className="text-red-500 text-xs mt-1 absolute">
+                          {formik.errors.state}
+                        </p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-slate-700 font-semibold mb-2 text-sm">
-                        Country (Optional)
+                        Country *
                       </label>
                       <input
                         className="w-full px-6 py-4 rounded-xl border border-slate-200 focus:border-brand-gold focus:ring-4 focus:ring-brand-gold/10 transition-all outline-none"
                         placeholder="United States"
                         {...formik.getFieldProps("country")}
                       />
+                      {formik.touched.country && formik.errors.country && (
+                        <p className="text-red-500 text-xs mt-1 absolute">
+                          {formik.errors.country}
+                        </p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-slate-700 font-semibold mb-2 text-sm">
-                        Postal Code (Optional)
+                        Postal Code *
                       </label>
                       <input
                         className="w-full px-6 py-4 rounded-xl border border-slate-200 focus:border-brand-gold focus:ring-4 focus:ring-brand-gold/10 transition-all outline-none"
                         placeholder="10001"
                         {...formik.getFieldProps("postalCode")}
                       />
+                      {formik.touched.postalCode &&
+                        formik.errors.postalCode && (
+                          <p className="text-red-500 text-xs mt-1 absolute">
+                            {formik.errors.postalCode}
+                          </p>
+                        )}
                     </div>
                   </div>
                 </div>
@@ -543,7 +597,7 @@ export default function AddAgentPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex items-center gap-2 bg-brand-navy hover:bg-brand-navy/90 text-white font-black px-10 py-5 rounded-full transition-all hover:shadow-xl hover:-translate-y-1 active:translate-y-0 disabled:opacity-50"
+                  className="flex cursor-pointer items-center gap-2 bg-brand-navy hover:bg-brand-navy/90 text-white font-black px-10 py-5 rounded-full transition-all hover:shadow-xl hover:-translate-y-1 active:translate-y-0 disabled:opacity-50"
                 >
                   {loading ? (
                     <span className="spinner border-2 w-5 h-5 border-white border-t-transparent" />
@@ -558,22 +612,6 @@ export default function AddAgentPage() {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-
-        {/* Footer info */}
-        <div className="mt-12 text-center text-slate-400 text-sm">
-          <p>© 2026 AgentPro! Marketplace. All rights reserved.</p>
-          <div className="flex justify-center gap-6 mt-4 font-bold text-slate-500 uppercase tracking-widest text-[10px]">
-            <a href="#" className="hover:text-brand-gold">
-              Security
-            </a>
-            <a href="#" className="hover:text-brand-gold">
-              Privacy
-            </a>
-            <a href="#" className="hover:text-brand-gold">
-              Support
-            </a>
           </div>
         </div>
       </div>

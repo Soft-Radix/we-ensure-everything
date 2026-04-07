@@ -108,7 +108,7 @@ const SingleSelect = ({
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute z-50 mt-2 w-full bg-white border border-slate-200 rounded-xl shadow-2xl max-h-64 overflow-hidden flex flex-col">
+        <div className="absolute z-50 mt-2 w-full bg-white border border-slate-200 rounded-xl shadow-2xl max-h-56 overflow-hidden flex flex-col">
           {/* Search */}
           <div className="p-2 border-b border-slate-100 bg-white sticky top-0">
             <input
