@@ -48,7 +48,7 @@ const MultiSelect = ({
         {label}
       </label>
       <div
-        className={`min-h-[50px] px-2 py-4 border rounded-xl bg-white truncate gap-2 cursor-pointer transition-all ${isOpen ? "ring-2 ring-brand-gold border-brand-gold" : "border-slate-200 hover:border-slate-300"}`}
+        className={`min-h-[50px] pr-2 pl-3 py-4 border rounded-xl bg-white truncate gap-2 cursor-pointer transition-all ${isOpen ? "ring-2 ring-brand-gold border-brand-gold" : "border-slate-200 hover:border-slate-300"}`}
         onClick={() => setIsOpen(!isOpen)}
       >
         {selected.length === 0 && (
