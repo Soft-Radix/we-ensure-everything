@@ -99,4 +99,4 @@ export const currentStepInfo = (step: number) => {
       return { title: "", sub: "" };
   }
 };
-export const adminRoute = "/admin-828053";
+export const adminRoute = "/admin";
