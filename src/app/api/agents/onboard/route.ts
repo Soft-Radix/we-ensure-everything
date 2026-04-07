@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sequelize, Agent, Category, Product, Seat, Waitlist } from "@/models";
+import { Op } from "sequelize";
 
 export async function POST(req: NextRequest) {
   try {
@@ -30,8 +31,25 @@ export async function POST(req: NextRequest) {
     const t = await sequelize.transaction();
 
     try {
-      // 1. Upsert agent
-      const [agent] = await Agent.upsert(
+      // Check if agent already exists with the same email or phone
+      const existingAgent = await Agent.findOne({
+        where: {
+          [Op.or]: [{ email }, { phone }],
+        },
+        transaction: t,
+      });
+
+      if (existingAgent) {
+        await t.rollback();
+        const field = existingAgent.email === email ? "email" : "phone number";
+        return NextResponse.json(
+          { error: `An agent with this ${field} already exists.` },
+          { status: 400 },
+        );
+      }
+
+      // 1. Create agent
+      const agent = await Agent.create(
         {
           full_name: fullName,
           email,

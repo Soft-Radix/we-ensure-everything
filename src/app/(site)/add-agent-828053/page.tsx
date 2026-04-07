@@ -303,6 +303,7 @@ export default function AddAgentPage() {
 
                   <MultiSelect
                     label="What County Are You In? *"
+                    showSelectAll
                     options={countiesList.map((c) => ({
                       label: `${c.name}, ${c.state_abbr}`,
                       value: c.id.toString(),
@@ -507,17 +508,17 @@ export default function AddAgentPage() {
                           I have read and agree to the Privacy Policy as well as
                           the Terms & Conditions provided by the AgentPro!.
                         </label>
-                        <p className="mt-2 flex items-start gap-2">
-                          <ShieldCheck
-                            size={16}
-                            className="text-brand-gold shrink-0 mt-0.5"
-                          />
-                          By providing my phone number, I agree to receive text
-                          messages and emails from the AgentPro!. Reply STOP to
-                          opt out.
-                        </p>
                       </div>
                     </div>
+                    <p className="mt-2 flex items-start gap-2 text-sm leading-relaxed text-slate-600">
+                      <ShieldCheck
+                        size={27}
+                        className="text-brand-gold  shrink-0 mt-0.5"
+                      />
+                      By providing my phone number, I agree to receive text
+                      messages and emails from the AgentPro!. Reply STOP to opt
+                      out.
+                    </p>
                     {formik.touched.termsAccepted &&
                       formik.errors.termsAccepted && (
                         <p className="text-red-500 text-xs mt-2">

@@ -35,6 +35,7 @@ export interface MultiSelectProps {
   onChange: (selected: string[]) => void;
   error?: string;
   placeholder?: string;
+  showSelectAll?: boolean;
 }
 export interface SingleSelectProps {
   label: string;
