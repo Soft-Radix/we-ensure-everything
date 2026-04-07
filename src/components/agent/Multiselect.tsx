@@ -9,6 +9,7 @@ const MultiSelect = ({
   onChange,
   error,
   placeholder,
+  showSelectAll,
 }: MultiSelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -25,13 +26,29 @@ const MultiSelect = ({
     }
   };
 
+  const isAllSelected =
+    options.length > 0 && options.every((opt) => selected.includes(opt.value));
+
+  const handleSelectAll = () => {
+    if (isAllSelected) {
+      // Remove all current options from selection
+      const optionValues = options.map((o) => o.value);
+      onChange(selected.filter((val) => !optionValues.includes(val)));
+    } else {
+      // Add all current options to selection
+      const optionValues = options.map((o) => o.value);
+      const newSelected = Array.from(new Set([...selected, ...optionValues]));
+      onChange(newSelected);
+    }
+  };
+
   return (
     <div className="relative mb-6">
       <label className="block text-slate-700 font-semibold mb-2 text-sm">
         {label}
       </label>
       <div
-        className={`min-h-[50px] p-2 border rounded-xl bg-white flex flex-wrap gap-2 cursor-pointer transition-all ${isOpen ? "ring-2 ring-brand-gold border-brand-gold" : "border-slate-200 hover:border-slate-300"}`}
+        className={`min-h-[50px] p-2 border rounded-xl bg-white truncate gap-2 cursor-pointer transition-all ${isOpen ? "ring-2 ring-brand-gold border-brand-gold" : "border-slate-200 hover:border-slate-300"}`}
         onClick={() => setIsOpen(!isOpen)}
       >
         {selected.length === 0 && (
@@ -42,7 +59,7 @@ const MultiSelect = ({
         {selected.map((val) => (
           <span
             key={val}
-            className="inline-flex items-center gap-1 bg-brand-gold/10 text-brand-navy px-3 py-1 rounded-full text-xs font-bold border border-brand-gold/20"
+            className="inline-flex items-center gap-1 bg-brand-gold/10 text-brand-navy px-3 py-1 rounded-full text-xs font-bold border border-brand-gold/20 mr-1"
           >
             {options.find((o) => o.value === val)?.label || val}
             <button
@@ -61,16 +78,34 @@ const MultiSelect = ({
 
       {isOpen && (
         <div className="absolute z-50 mt-2 w-full bg-white border border-slate-200 rounded-xl shadow-2xl max-h-60 overflow-hidden flex flex-col">
-          <div className="p-2 border-b border-slate-100 sticky top-0 bg-white">
+          <div className="p-2 border-b border-slate-100 sticky top-0 bg-white space-y-2">
             <input
               autoFocus
               type="text"
-              className="w-full p-2 text-sm border-none focus:ring-0 outline-none"
+              className="w-full p-2 text-sm border border-slate-100 rounded-lg focus:ring-0 outline-none"
               placeholder="Search..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onClick={(e) => e.stopPropagation()}
             />
+            {showSelectAll && options.length > 0 && (
+              <div
+                className="flex items-center justify-between px-2 pb-1 cursor-pointer group"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleSelectAll();
+                }}
+              >
+                <span className="text-xs font-bold text-brand-navy/60 group-hover:text-brand-navy">
+                  {isAllSelected ? "Deselect All" : "Select All"}
+                </span>
+                <div
+                  className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${isAllSelected ? "bg-brand-gold border-brand-gold" : "border-slate-300 bg-white"}`}
+                >
+                  {isAllSelected && <Check size={10} className="text-white" />}
+                </div>
+              </div>
+            )}
           </div>
           <div className="overflow-y-auto">
             {filteredOptions.length === 0 && (
