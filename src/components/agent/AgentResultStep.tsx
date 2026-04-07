@@ -50,7 +50,7 @@ const AgentResultStep = ({
                 href={`tel:${routingResult.agent.phone}`}
                 className="flex items-center justify-center gap-3 w-full py-4 bg-white border border-slate-200 rounded-xl font-bold text-brand-navy hover:border-brand-gold transition-colors no-underline"
               >
-                📞 {routingResult.agent.phone}
+                📞 +1 {routingResult.agent.phone}
               </a>
               <a
                 href={`mailto:${routingResult.agent.email}`}

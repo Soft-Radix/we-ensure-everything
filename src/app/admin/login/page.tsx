@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import * as Yup from "yup";
 import { useFormik } from "formik";
+import { adminRoute } from "@/lib/data/static";
 
 const validationSchema = Yup.object({
   email: Yup.string()
@@ -44,7 +45,7 @@ export default function AdminLoginPage() {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Login failed");
 
-        router.push("/admin");
+        router.push(adminRoute);
         router.refresh();
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : "Login failed";
@@ -174,7 +175,7 @@ export default function AdminLoginPage() {
                 <Activity className="w-4 h-4 animate-spin text-slate-900" />
               ) : (
                 <>
-                  Establish Connection
+                  Login
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </>
               )}
