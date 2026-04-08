@@ -9,6 +9,7 @@ import Waitlist from "./Waitlist";
 import Lead from "./Lead";
 import RoutingLog from "./RoutingLog";
 import User from "./User";
+import Licensed from "./Licensed";
 
 const models = {
   Agent,
@@ -21,6 +22,7 @@ const models = {
   Lead,
   RoutingLog,
   User,
+  Licensed,
 };
 
 // If there are any additional associations that need to be defined in a specific order, do it here.
@@ -37,6 +39,7 @@ export {
   Lead,
   RoutingLog,
   User,
+  Licensed,
 };
 
 export default models;
