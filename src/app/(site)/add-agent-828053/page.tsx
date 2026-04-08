@@ -324,9 +324,12 @@ export default function AddAgentPage() {
                       value: s.code,
                     }))}
                     selected={formik.values.selectedStates}
-                    onChange={(vals) =>
-                      formik.setFieldValue("selectedStates", vals)
-                    }
+                    onChange={(vals) => {
+                      if (vals.length < formik.values.selectedStates.length) {
+                        formik.setFieldValue("selectedCounties", []);
+                      }
+                      formik.setFieldValue("selectedStates", vals);
+                    }}
                     error={
                       formik.touched.selectedStates
                         ? (formik.errors.selectedStates as string)
@@ -365,9 +368,14 @@ export default function AddAgentPage() {
                       value: c.code,
                     }))}
                     selected={formik.values.selectedCategories}
-                    onChange={(vals) =>
-                      formik.setFieldValue("selectedCategories", vals)
-                    }
+                    onChange={(vals) => {
+                      if (
+                        vals.length < formik.values.selectedCategories.length
+                      ) {
+                        formik.setFieldValue("selectedProducts", []);
+                      }
+                      formik.setFieldValue("selectedCategories", vals);
+                    }}
                     error={
                       formik.touched.selectedCategories
                         ? (formik.errors.selectedCategories as string)
@@ -382,6 +390,7 @@ export default function AddAgentPage() {
                       label: p.name,
                       value: p.code,
                     }))}
+                    showSelectAll
                     selected={formik.values.selectedProducts}
                     onChange={(vals) =>
                       formik.setFieldValue("selectedProducts", vals)
