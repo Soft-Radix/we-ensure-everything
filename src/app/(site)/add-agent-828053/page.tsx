@@ -70,18 +70,19 @@ export default function AddAgentPage() {
       } else {
         setLoading(true);
         try {
-          const res = await fetch("/api/agents/onboard", {
+          const res = await fetch("/api/agents/licensed-in", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(values),
           });
           const data = await res.json();
           if (data.success) {
-            toast.success("Agent onboarded successfully!");
-            formik.resetForm();
-            setStep(1);
+            toast.success("Registration step 1 complete!");
+            // Redirect to payment page created by client
+            const paymentUrl = "https://offers.agentprofl.com/agentproplus"; // TODO: Replace with the actual client payment URL
+            window.location.href = paymentUrl;
           } else {
-            toast.error("Failed to onboard agent: " + data.error);
+            toast.error("Failed to process registration: " + data.error);
           }
         } catch (err) {
           console.error("Onboarding error:", err);
