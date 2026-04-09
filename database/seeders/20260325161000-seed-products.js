@@ -6,8 +6,8 @@ module.exports = {
     // Disable foreign key checks
     await queryInterface.sequelize.query("SET FOREIGN_KEY_CHECKS = 0;");
 
-    // Clear existing products
-    await queryInterface.bulkDelete("products", null, {});
+    // We are NOT clearing existing products anymore to preserve IDs and references.
+    // Instead, we use an upsert strategy.
 
     // Get categories to map codes to IDs
     const [categories] = await queryInterface.sequelize.query(
@@ -74,6 +74,7 @@ module.exports = {
       },
 
       // HEALTH
+      { cat: "HEALTH", code: "HEALTH", name: "Health" },
       { cat: "HEALTH", code: "FSA", name: "FSA" },
       { cat: "HEALTH", code: "HAS", name: "HSA (HAS)" },
       { cat: "HEALTH", code: "HRA", name: "HRA" },
@@ -260,6 +261,7 @@ module.exports = {
       },
     ];
 
+    // Build the final products array
     const finalProducts = productsData.map((p, index) => ({
       category_id: categoryMap[p.cat],
       code: p.code,
@@ -269,13 +271,49 @@ module.exports = {
       created_at: new Date(),
     }));
 
-    await queryInterface.bulkInsert("products", finalProducts);
+    // Perform Upsert Row by Row (Safest for maintaining IDs)
+    for (const prod of finalProducts) {
+      if (!prod.category_id) {
+        console.warn(`Skipping product ${prod.code}: Category mapping failed.`);
+        continue;
+      }
+
+      // Check if product exists by category_id and code
+      const [existing] = await queryInterface.sequelize.query(
+        "SELECT id FROM products WHERE category_id = :category_id AND code = :code",
+        {
+          replacements: {
+            category_id: prod.category_id,
+            code: prod.code,
+          },
+          type: queryInterface.sequelize.QueryTypes.SELECT,
+        },
+      );
+
+      if (existing) {
+        // Update existing item (Keeps the ID)
+        await queryInterface.sequelize.query(
+          "UPDATE products SET name = :name, sort_order = :sort_order, active = :active WHERE id = :id",
+          {
+            replacements: {
+              name: prod.name,
+              sort_order: prod.sort_order,
+              active: prod.active,
+              id: existing.id,
+            },
+          },
+        );
+      } else {
+        // Insert new item
+        await queryInterface.bulkInsert("products", [prod]);
+      }
+    }
 
     // Re-enable foreign key checks
     await queryInterface.sequelize.query("SET FOREIGN_KEY_CHECKS = 1;");
   },
 
   async down(queryInterface) {
-    await queryInterface.bulkDelete("products", null, {});
+    // We avoid wiping everything in down to protect production data references.
   },
 };
