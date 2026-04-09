@@ -1,5 +1,5 @@
 import Link from "next/link";
-import React from "react";
+import { Check } from "lucide-react";
 
 const HeroBanner = () => {
   return (
@@ -29,11 +29,26 @@ const HeroBanner = () => {
             Anywhere in the U.S.
           </h1>
 
-          <p className="text-xl  text-white leading-relaxed mb-12 max-w-2xl font-normal">
+          <p className="text-xl  text-white leading-relaxed mb-8 max-w-2xl font-normal">
             Connect with our licensed, vetted insurance agents based on your
             location, needs, and coverage type so you get the right policy, not
             just a quote.
           </p>
+
+          <div className="flex flex-col sm:flex-row flex-wrap gap-x-8 gap-y-4 mb-12">
+            {[
+              "All Insurance Coverages",
+              "All 50 States",
+              "All Local, Licensed Agents",
+            ].map((item, index) => (
+              <div key={index} className="flex items-center gap-3">
+                <div className="shrink-0 w-6 h-6 rounded-full bg-brand-gold/20 flex items-center justify-center border border-brand-gold/30">
+                  <Check className="w-4 h-4 text-brand-gold" strokeWidth={3} />
+                </div>
+                <span className="text-lg font-bold text-white/90">{item}</span>
+              </div>
+            ))}
+          </div>
 
           <div className="flex flex-col sm:flex-row gap-5">
             <Link
