@@ -10,6 +10,7 @@ import Lead from "./Lead";
 import RoutingLog from "./RoutingLog";
 import User from "./User";
 import Licensed from "./Licensed";
+import Payment from "./Payment";
 
 const models = {
   Agent,
@@ -23,6 +24,7 @@ const models = {
   RoutingLog,
   User,
   Licensed,
+  Payment,
 };
 
 // If there are any additional associations that need to be defined in a specific order, do it here.
@@ -40,6 +42,7 @@ export {
   RoutingLog,
   User,
   Licensed,
+  Payment,
 };
 
 export default models;

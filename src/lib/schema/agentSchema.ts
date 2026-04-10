@@ -1,4 +1,5 @@
 import * as Yup from "yup";
+import { PlanType } from "../enum";
 
 /* ── Validation Schemas ───────────────────────────────────────── */
 
@@ -41,4 +42,25 @@ export const step3Schema = Yup.object().shape({
   termsAccepted: Yup.boolean()
     .oneOf([true], "You must accept the terms and conditions")
     .required("Required"),
+});
+
+export const onboardingSchema = Yup.object().shape({
+  selectedStates: Yup.array()
+    .min(1, "Select at least one state")
+    .required("Required"),
+  selectedCounties: Yup.array().when("planType", {
+    is: (val: string) => val !== PlanType.AGENT_PRO_PLUS,
+    then: (schema) =>
+      schema.min(1, "Select at least one county").required("Required"),
+    otherwise: (schema) => schema.optional(),
+  }),
+  selectedCategories: Yup.array()
+    .min(1, "Select at least one category")
+    .required("Required"),
+  selectedProducts: Yup.array().when("planType", {
+    is: PlanType.REFFERAL_PRO,
+    then: (schema) =>
+      schema.min(1, "Select at least one product").required("Required"),
+    otherwise: (schema) => schema.optional(),
+  }),
 });
