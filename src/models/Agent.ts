@@ -1,5 +1,6 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../lib/sequelize";
+import { PlanType } from "../lib/enum";
 
 export interface AgentAttributes {
   id: number;
@@ -20,15 +21,16 @@ export interface AgentAttributes {
   bio?: string | null;
   photo_url?: string | null;
   website_url?: string | null;
+  plan_type?: PlanType | null;
   status: "active" | "inactive" | "suspended";
   created_at?: Date;
   updated_at?: Date;
 }
 
-export interface AgentCreationAttributes extends Optional<
+export type AgentCreationAttributes = Optional<
   AgentAttributes,
   "id" | "status" | "created_at" | "updated_at"
-> {}
+>;
 
 class Agent
   extends Model<AgentAttributes, AgentCreationAttributes>
@@ -52,6 +54,7 @@ class Agent
   public bio?: string | null;
   public photo_url?: string | null;
   public website_url?: string | null;
+  public plan_type?: PlanType | null;
   public status!: "active" | "inactive" | "suspended";
 
   public readonly created_at!: Date;
@@ -137,6 +140,10 @@ Agent.init(
     },
     website_url: {
       type: DataTypes.STRING(500),
+      allowNull: true,
+    },
+    plan_type: {
+      type: DataTypes.ENUM(...Object.values(PlanType)),
       allowNull: true,
     },
     status: {
