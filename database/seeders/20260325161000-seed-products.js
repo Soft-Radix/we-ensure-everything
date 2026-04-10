@@ -6,8 +6,8 @@ module.exports = {
     // Disable foreign key checks
     await queryInterface.sequelize.query("SET FOREIGN_KEY_CHECKS = 0;");
 
-    // We are NOT clearing existing products anymore to preserve IDs and references.
-    // Instead, we use an upsert strategy.
+    // Truncate the products table (removes all rows, resets auto-increment)
+    await queryInterface.sequelize.query("TRUNCATE TABLE products;");
 
     // Get categories to map codes to IDs
     const [categories] = await queryInterface.sequelize.query(
@@ -74,7 +74,7 @@ module.exports = {
       },
 
       // HEALTH
-      { cat: "HEALTH", code: "HEALTH", name: "Health" },
+      { cat: "HEALTH", code: "INDIVIDUAL_HEALTH", name: "Individual Health" },
       { cat: "HEALTH", code: "FSA", name: "FSA" },
       { cat: "HEALTH", code: "HAS", name: "HSA (HAS)" },
       { cat: "HEALTH", code: "HRA", name: "HRA" },
