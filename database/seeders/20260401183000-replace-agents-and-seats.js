@@ -40,7 +40,7 @@ module.exports = {
         phone: "8139291150",
       },
       {
-        full_name: "saurabhfinite",
+        full_name: "Saurabh Bhatt",
         email: "sb@infiniteinsuranceusa.com",
         phone: "9549870100",
       },
