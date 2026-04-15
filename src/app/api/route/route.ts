@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import pool from "@/lib/db";
 import { randomUUID } from "crypto";
+import { Op } from "sequelize";
+import {
+  Lead,
+  RoutingLog,
+  Category,
+  Product,
+  County,
+  Seat,
+  Agent,
+} from "@/models";
 
 /* ──────────────────────────────────────────────────────────────
    POST /api/route
@@ -49,84 +58,87 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const conn = await pool.getConnection();
-
   try {
-    // ── 2. Idempotency check (no reassignment within 24 hours for same email+product) ──
-    if (email) {
-      const [recent] = await conn.query<any[]>(
-        `SELECT id, routing_status, assigned_agent_id FROM leads
-         WHERE email = ? AND product_id = (
-           SELECT p.id FROM products p
-           JOIN categories c ON c.id = p.category_id
-           WHERE c.code = ? AND p.code = ?
-           LIMIT 1
-         )
-         AND created_at > DATE_SUB(NOW(), INTERVAL 24 HOUR)
-         LIMIT 1`,
-        [email, categoryCode.toUpperCase(), productCode.toUpperCase()],
+    // ── 2. Resolve category & product ──────────────────────────
+    const product = await Product.findOne({
+      where: {
+        code: productCode.toUpperCase(),
+        active: true,
+      },
+      include: [
+        {
+          model: Category,
+          where: {
+            code: categoryCode.toUpperCase(),
+            active: true,
+          },
+        },
+      ],
+    });
+
+    if (!product || !product.Category) {
+      return NextResponse.json(
+        { error: "Invalid category or product code" },
+        { status: 400 },
       );
-      if (recent.length > 0) {
+    }
+
+    const { id: productId, name: productName } = product;
+    const { id: categoryId, name: categoryName } = product.Category;
+
+    // ── 3. Idempotency check ───────────────────────────────────
+    if (email) {
+      const recent = await Lead.findOne({
+        where: {
+          email,
+          product_id: productId,
+          created_at: {
+            [Op.gt]: new Date(Date.now() - 24 * 60 * 60 * 1000),
+          },
+        },
+      });
+
+      if (recent) {
         return NextResponse.json(
           {
             status: "duplicate",
             message:
               "A routing request was already submitted in the last 24 hours.",
-            leadId: recent[0].id,
+            leadId: recent.id,
           },
           { status: 200 },
         );
       }
     }
 
-    // ── 3. Resolve category & product IDs ────────────────────────
-    const [catRows] = await conn.query<any[]>(
-      `SELECT c.id AS categoryId, c.name AS categoryName, p.id AS productId, p.name AS productName
-       FROM categories c
-       JOIN products p ON p.category_id = c.id
-       WHERE c.code = ? AND p.code = ? AND c.active = 1 AND p.active = 1
-       LIMIT 1`,
-      [categoryCode.toUpperCase(), productCode.toUpperCase()],
-    );
-
-    if (catRows.length === 0) {
-      return NextResponse.json(
-        { error: "Invalid category or product code" },
-        { status: 400 },
-      );
-    }
-    const { categoryId, categoryName, productId, productName } = catRows[0];
-
-    // ── 4. Validate county ───────────────────────────────────────
-    const [countyRows] = await conn.query<any[]>(
-      `SELECT name, state_abbr FROM counties WHERE id = ? LIMIT 1`,
-      [countyId],
-    );
-    if (countyRows.length === 0) {
+    // ── 4. Validate county ─────────────────────────────────────
+    const county = await County.findByPk(countyId);
+    if (!county) {
       return NextResponse.json({ error: "Invalid county ID" }, { status: 400 });
     }
-    const { name: countyName, state_abbr: stateAbbr } = countyRows[0];
-    const fullCountyDisplay = `${countyName} (${stateAbbr})`;
+    const fullCountyDisplay = `${county.name} (${county.state_abbr})`;
 
-    // ── 5. Look up exclusive seat ────────────────────────────────
-    const [seatRows] = await conn.query<any[]>(
-      `SELECT s.id AS seatId, a.id AS agentId,
-              a.full_name, a.email AS agentEmail,
-              a.phone AS agentPhone, a.photo_url, a.bio,
-              a.website_url, a.ghl_user_id, a.license_state
-       FROM seats s
-       JOIN agents a ON a.id = s.agent_id
-       WHERE s.county_id = ? AND s.category_id = ? AND s.product_id = ?
-         AND s.status = 'active' AND a.status = 'active'
-       LIMIT 1`,
-      [countyId, categoryId, productId],
-    );
+    // ── 5. Look up exclusive seat ─────────────────────────────
+    const seat = await Seat.findOne({
+      where: {
+        county_id: countyId,
+        category_id: categoryId,
+        product_id: productId,
+        status: "active",
+      },
+      include: [
+        {
+          model: Agent,
+          where: { status: "active" },
+        },
+      ],
+    });
 
     const leadId = randomUUID();
     const latencyMs = Date.now() - startTime;
 
     // Helper for GHL Webhook
-    const sendToGHL = async (agentInfo: any = null) => {
+    const sendToGHL = async (agentInfo: Agent | null = null) => {
       const ghlWebhookUrl = process.env.GHL_WEBHOOK;
       if (!ghlWebhookUrl) return;
 
@@ -143,8 +155,8 @@ export async function POST(req: NextRequest) {
       if (agentInfo) {
         payload.agent = {
           name: agentInfo.full_name,
-          email: agentInfo.agentEmail,
-          phone: agentInfo.agentPhone,
+          email: agentInfo.email,
+          phone: agentInfo.phone,
         };
       }
 
@@ -160,44 +172,38 @@ export async function POST(req: NextRequest) {
       }
     };
 
-    // ── 6a. AGENT FOUND → assign ─────────────────────────────────
-    if (seatRows.length > 0) {
-      const agent = seatRows[0];
+    // ── 6a. AGENT FOUND → assign ───────────────────────────────
+    if (seat && (seat as any).Agent) {
+      const agent = (seat as any).Agent as Agent;
 
-      await conn.query(
-        `INSERT INTO leads (id, county_id, category_id, product_id,
-           first_name, last_name, email, phone,
-           assigned_agent_id, routing_status, source, referred_by_agent_id, routed_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'assigned', ?, ?, NOW())`,
-        [
-          leadId,
+      await Lead.create({
+        id: leadId,
+        county_id: countyId,
+        category_id: categoryId,
+        product_id: productId,
+        first_name: firstName || null,
+        last_name: lastName || null,
+        email: email || null,
+        phone: phone || null,
+        assigned_agent_id: agent.id,
+        routing_status: "assigned",
+        source,
+        referred_by_agent_id: referredBy || null,
+        routed_at: new Date(),
+      });
+
+      await RoutingLog.create({
+        lead_id: leadId,
+        event: "ROUTED_TO_AGENT",
+        payload: {
+          agentId: agent.id,
           countyId,
           categoryId,
           productId,
-          firstName || null,
-          lastName || null,
-          email || null,
-          phone || null,
-          agent.agentId,
-          source,
-          referredBy || null,
-        ],
-      );
-
-      await conn.query(
-        `INSERT INTO routing_logs (lead_id, event, payload, status, latency_ms)
-         VALUES (?, 'ROUTED_TO_AGENT', ?, 'success', ?)`,
-        [
-          leadId,
-          JSON.stringify({
-            agentId: agent.agentId,
-            countyId,
-            categoryId,
-            productId,
-          }),
-          latencyMs,
-        ],
-      );
+        },
+        status: "success",
+        latency_ms: latencyMs,
+      });
 
       // Trigger GHL Webhook with Agent
       await sendToGHL(agent);
@@ -206,10 +212,10 @@ export async function POST(req: NextRequest) {
         status: "assigned",
         leadId,
         agent: {
-          id: agent.agentId,
+          id: agent.id,
           fullName: agent.full_name,
-          email: agent.agentEmail,
-          phone: agent.agentPhone,
+          email: agent.email,
+          phone: agent.phone,
           photoUrl: agent.photo_url,
           bio: agent.bio,
           websiteUrl: agent.website_url,
@@ -219,31 +225,29 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // ── 6b. NO AGENT → log and return no-agent state ─────────────
-    await conn.query(
-      `INSERT INTO leads (id, county_id, category_id, product_id,
-         first_name, last_name, email, phone,
-         routing_status, source, referred_by_agent_id, routed_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'no_agent', ?, ?, NOW())`,
-      [
-        leadId,
-        countyId,
-        categoryId,
-        productId,
-        firstName || null,
-        lastName || null,
-        email || null,
-        phone || null,
-        source,
-        referredBy || null,
-      ],
-    );
+    // ── 6b. NO AGENT → log and return no-agent state ───────────
+    await Lead.create({
+      id: leadId,
+      county_id: countyId,
+      category_id: categoryId,
+      product_id: productId,
+      first_name: firstName || null,
+      last_name: lastName || null,
+      email: email || null,
+      phone: phone || null,
+      routing_status: "no_agent",
+      source,
+      referred_by_agent_id: referredBy || null,
+      routed_at: new Date(),
+    });
 
-    await conn.query(
-      `INSERT INTO routing_logs (lead_id, event, payload, status, latency_ms)
-       VALUES (?, 'NO_AGENT_FOUND', ?, 'success', ?)`,
-      [leadId, JSON.stringify({ countyId, categoryId, productId }), latencyMs],
-    );
+    await RoutingLog.create({
+      lead_id: leadId,
+      event: "NO_AGENT_FOUND",
+      payload: { countyId, categoryId, productId },
+      status: "success",
+      latency_ms: latencyMs,
+    });
 
     // Trigger GHL Webhook without Agent
     await sendToGHL();
@@ -254,27 +258,25 @@ export async function POST(req: NextRequest) {
       message:
         "No exclusive agent is currently available in your area for this coverage. Our team will follow up with you shortly.",
     });
-  } catch (err) {
+  } catch (err: any) {
     console.error("[API /route] Error:", err);
 
-    await conn
-      .query(
-        `INSERT INTO routing_logs (lead_id, event, payload, status, error_msg, latency_ms)
-       VALUES (?, 'ROUTING_ERROR', ?, 'failure', ?, ?)`,
-        [
-          randomUUID(),
-          JSON.stringify({ countyId, categoryCode, productCode }),
-          String(err),
-          Date.now() - startTime,
-        ],
-      )
-      .catch(() => {});
+    try {
+      await RoutingLog.create({
+        lead_id: randomUUID(),
+        event: "ROUTING_ERROR",
+        payload: { countyId, categoryCode, productCode },
+        status: "failure",
+        error_msg: String(err),
+        latency_ms: Date.now() - startTime,
+      });
+    } catch (logErr) {
+      console.error("Failed to log error to routing_logs:", logErr);
+    }
 
     return NextResponse.json(
       { error: "Internal routing error. Please try again." },
       { status: 500 },
     );
-  } finally {
-    conn.release();
   }
 }

@@ -23,6 +23,7 @@ export interface LeadAttributes {
   source?: string | null;
   ip_address?: string | null;
   routed_at?: Date | null;
+  created_at?: Date;
 }
 
 export interface LeadCreationAttributes extends Optional<
