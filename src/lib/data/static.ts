@@ -100,3 +100,6 @@ export const currentStepInfo = (step: number) => {
   }
 };
 export const adminRoute = "/admin";
+export const paymentPage = "https://offers.agentprofl.com/agentproplus";
+export const demoPage =
+  "https://offers.agentprofl.com/registration-calendar-page";

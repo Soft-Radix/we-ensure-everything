@@ -211,225 +211,238 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-20 px-6">
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-gold/10 rounded-3xl mb-6 shadow-inner">
-            <LayoutGrid className="text-brand-gold" size={32} />
-          </div>
-          <h1 className="text-4xl font-heading font-black text-brand-navy mb-3">
-            Territory Onboarding
-          </h1>
-          <p className="text-slate-500 text-lg max-w-sm mx-auto">
-            Secure your exclusive specialist markets and start accepting leads.
-          </p>
-        </div>
-
-        <div className="bg-white rounded-4xl shadow-2xl p-10 border border-slate-100 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/5 rounded-full -mr-16 -mt-16 blur-3xl pointer-events-none" />
-
-          {step === 1 ? (
-            <div className="space-y-8 relative z-10">
-              <div className="bg-brand-navy/5 p-6 rounded-3xl border border-brand-navy/10">
-                <p className="text-brand-navy font-bold text-sm mb-1 flex items-center gap-2">
-                  <ShieldCheck size={16} className="text-brand-gold" />
-                  Account Verification
-                </p>
-                <p className="text-xs text-slate-500">
-                  Enter the email address you used during payment to unlock your
-                  territory selection.
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-slate-700 font-bold mb-3 text-sm ml-1">
-                  Registered Email
-                </label>
-                <div className="relative">
-                  <Mail
-                    className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"
-                    size={20}
-                  />
-                  <input
-                    className="w-full pl-14 pr-6 py-5 rounded-2xl border border-slate-200 focus:border-brand-gold focus:ring-4 focus:ring-brand-gold/10 outline-none transition-all text-lg"
-                    placeholder="agent@example.com"
-                    value={formik.values.email}
-                    onChange={(e) =>
-                      formik.setFieldValue("email", e.target.value)
-                    }
-                  />
-                </div>
-              </div>
-
-              <button
-                onClick={handleVerifyEmail}
-                disabled={loading}
-                className="w-full py-5 bg-brand-navy hover:bg-brand-navy/90 text-white rounded-2xl font-black text-lg transition-all hover:shadow-2xl hover:-translate-y-1 active:translate-y-0 disabled:opacity-50"
-              >
-                {loading ? "Verifying Account..." : "Verify & Continue"}
-              </button>
-            </div>
-          ) : (
-            <form
-              onSubmit={formik.handleSubmit}
-              className="space-y-6 relative z-10"
-            >
-              {/* Agent Badge */}
-              <div className="flex items-center justify-between bg-slate-50 p-5 rounded-3xl border border-slate-100">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-slate-100">
-                    <CheckCircle2 className="text-brand-gold" size={24} />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-brand-navy">
-                      {agent.fullName}
-                    </h3>
-                    <p className="text-[10px] uppercase tracking-widest font-black text-brand-gold">
-                      {agent.planType.replace(/_/g, " ")}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setStep(1)}
-                  className="text-xs text-slate-400 hover:text-brand-navy underline"
-                >
-                  Change Email
-                </button>
-              </div>
-
-              {/* Selections */}
-              <div className="grid grid-cols-1 gap-2">
-                <MultiSelect
-                  label="Which states are you licensed in? *"
-                  options={statesList.map((s) => ({
-                    label: s.name,
-                    value: s.code,
-                  }))}
-                  selected={formik.values.selectedStates}
-                  onChange={(vals) => {
-                    formik.setFieldValue("selectedStates", vals);
-                    formik.setFieldValue("selectedCounties", []);
-                  }}
-                  error={formik.errors.selectedStates as string}
-                />
-
-                {agent.planType !== PlanType.AGENT_PRO_PLUS && (
-                  <MultiSelect
-                    label="Select Your Counties *"
-                    showSelectAll
-                    options={countiesList.map((c) => ({
-                      label: `${c.name}, ${c.state_abbr}`,
-                      value: c.id.toString(),
-                    }))}
-                    selected={formik.values.selectedCounties}
-                    onChange={(vals) =>
-                      formik.setFieldValue("selectedCounties", vals)
-                    }
-                    error={formik.errors.selectedCounties as string}
-                    placeholder={
-                      formik.values.selectedStates.length > 0
-                        ? "Select counties..."
-                        : "First select states"
-                    }
-                  />
-                )}
-
-                <MultiSelect
-                  label="Type of Coverage *"
-                  options={categoriesList.map((c) => ({
-                    label: c.name,
-                    value: c.id.toString(),
-                  }))}
-                  selected={formik.values.selectedCategories}
-                  onChange={(vals) => {
-                    formik.setFieldValue("selectedCategories", vals);
-                    formik.setFieldValue("selectedProducts", []);
-                  }}
-                  error={formik.errors.selectedCategories as string}
-                />
-
-                {agent.planType === PlanType.REFFERAL_PRO && (
-                  <MultiSelect
-                    label="Specific Products *"
-                    showSelectAll
-                    options={availableProducts.map((p) => ({
-                      label: p.name,
-                      value: p.id.toString(),
-                    }))}
-                    selected={formik.values.selectedProducts}
-                    onChange={(vals) =>
-                      formik.setFieldValue("selectedProducts", vals)
-                    }
-                    error={formik.errors.selectedProducts as string}
-                    placeholder={
-                      formik.values.selectedCategories.length > 0
-                        ? "Select products..."
-                        : "First select coverage"
-                    }
-                  />
-                )}
-              </div>
-
-              {/* Status Display */}
-              {checkingAvailability ? (
-                <div className="flex items-center gap-3 text-slate-400 py-2 ml-1">
-                  <div className="w-5 h-5 border-2 border-brand-gold border-t-transparent rounded-full animate-spin" />
-                  <span className="text-sm font-medium">
-                    Checking market availability...
-                  </span>
-                </div>
-              ) : (
-                availability && (
-                  <div
-                    className={`p-6 rounded-3xl flex items-start gap-4 transition-all animate-in fade-in slide-in-from-top-2 ${availability.isAvailable ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-amber-50 text-amber-700 border border-amber-100"}`}
-                  >
-                    <div
-                      className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${availability.isAvailable ? "bg-white" : "bg-white"}`}
-                    >
-                      {availability.isAvailable ? (
-                        <MapIcon size={20} />
-                      ) : (
-                        <Clock size={20} />
-                      )}
-                    </div>
-                    <div>
-                      <p className="font-black text-sm uppercase tracking-tight">
-                        {availability.isAvailable
-                          ? "Market Open"
-                          : "High Demand Area"}
-                      </p>
-                      <p className="text-xs leading-relaxed mt-0.5 opacity-90">
-                        {availability.message}
-                      </p>
-                    </div>
-                  </div>
-                )
-              )}
-
-              <button
-                type="submit"
-                disabled={loading || checkingAvailability}
-                className="w-full py-5 bg-brand-navy hover:bg-brand-navy/90 text-white rounded-2xl font-black text-lg transition-all hover:shadow-2xl hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 flex items-center justify-center gap-3"
-              >
-                {loading ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    {availability?.isAvailable
-                      ? "Claim Exclusive Markets"
-                      : "Secure Waitlist Spot"}
-                    <ChevronRight size={20} />
-                  </>
-                )}
-              </button>
-            </form>
-          )}
-        </div>
+    <div className="h-screen flex items-center justify-center">
+      <div className="text-center">
+        <h1 className="text-4xl font-heading font-black text-brand-navy mb-3">
+          Currently under maintenance
+        </h1>
+        <p className="text-slate-500">
+          We'll be back soon with a better experience.
+        </p>
       </div>
     </div>
   );
+
+  // return (
+  //   <div className="min-h-screen bg-slate-50 py-20 px-6">
+  //     <div className="max-w-2xl mx-auto">
+  //       <div className="text-center mb-12">
+  //         <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-gold/10 rounded-3xl mb-6 shadow-inner">
+  //           <LayoutGrid className="text-brand-gold" size={32} />
+  //         </div>
+  //         <h1 className="text-4xl font-heading font-black text-brand-navy mb-3">
+  //           Territory Onboarding
+  //         </h1>
+  //         <p className="text-slate-500 text-lg max-w-sm mx-auto">
+  //           Secure your exclusive specialist markets and start accepting leads.
+  //         </p>
+  //       </div>
+
+  //       <div className="bg-white rounded-4xl shadow-2xl p-10 border border-slate-100 relative overflow-hidden">
+  //         <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/5 rounded-full -mr-16 -mt-16 blur-3xl pointer-events-none" />
+
+  //         {step === 1 ? (
+  //           <div className="space-y-8 relative z-10">
+  //             <div className="bg-brand-navy/5 p-6 rounded-3xl border border-brand-navy/10">
+  //               <p className="text-brand-navy font-bold text-sm mb-1 flex items-center gap-2">
+  //                 <ShieldCheck size={16} className="text-brand-gold" />
+  //                 Account Verification
+  //               </p>
+  //               <p className="text-xs text-slate-500">
+  //                 Enter the email address you used during payment to unlock your
+  //                 territory selection.
+  //               </p>
+  //             </div>
+
+  //             <div>
+  //               <label className="block text-slate-700 font-bold mb-3 text-sm ml-1">
+  //                 Registered Email
+  //               </label>
+  //               <div className="relative">
+  //                 <Mail
+  //                   className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"
+  //                   size={20}
+  //                 />
+  //                 <input
+  //                   className="w-full pl-14 pr-6 py-5 rounded-2xl border border-slate-200 focus:border-brand-gold focus:ring-4 focus:ring-brand-gold/10 outline-none transition-all text-lg"
+  //                   placeholder="agent@example.com"
+  //                   value={formik.values.email}
+  //                   onChange={(e) =>
+  //                     formik.setFieldValue("email", e.target.value)
+  //                   }
+  //                 />
+  //               </div>
+  //             </div>
+
+  //             <button
+  //               onClick={handleVerifyEmail}
+  //               disabled={loading}
+  //               className="w-full py-5 bg-brand-navy hover:bg-brand-navy/90 text-white rounded-2xl font-black text-lg transition-all hover:shadow-2xl hover:-translate-y-1 active:translate-y-0 disabled:opacity-50"
+  //             >
+  //               {loading ? "Verifying Account..." : "Verify & Continue"}
+  //             </button>
+  //           </div>
+  //         ) : (
+  //           <form
+  //             onSubmit={formik.handleSubmit}
+  //             className="space-y-6 relative z-10"
+  //           >
+  //             {/* Agent Badge */}
+  //             <div className="flex items-center justify-between bg-slate-50 p-5 rounded-3xl border border-slate-100">
+  //               <div className="flex items-center gap-4">
+  //                 <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-slate-100">
+  //                   <CheckCircle2 className="text-brand-gold" size={24} />
+  //                 </div>
+  //                 <div>
+  //                   <h3 className="font-bold text-brand-navy">
+  //                     {agent.fullName}
+  //                   </h3>
+  //                   <p className="text-[10px] uppercase tracking-widest font-black text-brand-gold">
+  //                     {agent.planType.replace(/_/g, " ")}
+  //                   </p>
+  //                 </div>
+  //               </div>
+  //               <button
+  //                 type="button"
+  //                 onClick={() => setStep(1)}
+  //                 className="text-xs text-slate-400 hover:text-brand-navy underline"
+  //               >
+  //                 Change Email
+  //               </button>
+  //             </div>
+
+  //             {/* Selections */}
+  //             <div className="grid grid-cols-1 gap-2">
+  //               <MultiSelect
+  //                 label="Which states are you licensed in? *"
+  //                 options={statesList.map((s) => ({
+  //                   label: s.name,
+  //                   value: s.code,
+  //                 }))}
+  //                 selected={formik.values.selectedStates}
+  //                 onChange={(vals) => {
+  //                   formik.setFieldValue("selectedStates", vals);
+  //                   formik.setFieldValue("selectedCounties", []);
+  //                 }}
+  //                 error={formik.errors.selectedStates as string}
+  //               />
+
+  //               {agent.planType !== PlanType.AGENT_PRO_PLUS && (
+  //                 <MultiSelect
+  //                   label="Select Your Counties *"
+  //                   showSelectAll
+  //                   options={countiesList.map((c) => ({
+  //                     label: `${c.name}, ${c.state_abbr}`,
+  //                     value: c.id.toString(),
+  //                   }))}
+  //                   selected={formik.values.selectedCounties}
+  //                   onChange={(vals) =>
+  //                     formik.setFieldValue("selectedCounties", vals)
+  //                   }
+  //                   error={formik.errors.selectedCounties as string}
+  //                   placeholder={
+  //                     formik.values.selectedStates.length > 0
+  //                       ? "Select counties..."
+  //                       : "First select states"
+  //                   }
+  //                 />
+  //               )}
+
+  //               <MultiSelect
+  //                 label="Type of Coverage *"
+  //                 options={categoriesList.map((c) => ({
+  //                   label: c.name,
+  //                   value: c.id.toString(),
+  //                 }))}
+  //                 selected={formik.values.selectedCategories}
+  //                 onChange={(vals) => {
+  //                   formik.setFieldValue("selectedCategories", vals);
+  //                   formik.setFieldValue("selectedProducts", []);
+  //                 }}
+  //                 error={formik.errors.selectedCategories as string}
+  //               />
+
+  //               {agent.planType === PlanType.REFFERAL_PRO && (
+  //                 <MultiSelect
+  //                   label="Specific Products *"
+  //                   showSelectAll
+  //                   options={availableProducts.map((p) => ({
+  //                     label: p.name,
+  //                     value: p.id.toString(),
+  //                   }))}
+  //                   selected={formik.values.selectedProducts}
+  //                   onChange={(vals) =>
+  //                     formik.setFieldValue("selectedProducts", vals)
+  //                   }
+  //                   error={formik.errors.selectedProducts as string}
+  //                   placeholder={
+  //                     formik.values.selectedCategories.length > 0
+  //                       ? "Select products..."
+  //                       : "First select coverage"
+  //                   }
+  //                 />
+  //               )}
+  //             </div>
+
+  //             {/* Status Display */}
+  //             {checkingAvailability ? (
+  //               <div className="flex items-center gap-3 text-slate-400 py-2 ml-1">
+  //                 <div className="w-5 h-5 border-2 border-brand-gold border-t-transparent rounded-full animate-spin" />
+  //                 <span className="text-sm font-medium">
+  //                   Checking market availability...
+  //                 </span>
+  //               </div>
+  //             ) : (
+  //               availability && (
+  //                 <div
+  //                   className={`p-6 rounded-3xl flex items-start gap-4 transition-all animate-in fade-in slide-in-from-top-2 ${availability.isAvailable ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-amber-50 text-amber-700 border border-amber-100"}`}
+  //                 >
+  //                   <div
+  //                     className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${availability.isAvailable ? "bg-white" : "bg-white"}`}
+  //                   >
+  //                     {availability.isAvailable ? (
+  //                       <MapIcon size={20} />
+  //                     ) : (
+  //                       <Clock size={20} />
+  //                     )}
+  //                   </div>
+  //                   <div>
+  //                     <p className="font-black text-sm uppercase tracking-tight">
+  //                       {availability.isAvailable
+  //                         ? "Market Open"
+  //                         : "High Demand Area"}
+  //                     </p>
+  //                     <p className="text-xs leading-relaxed mt-0.5 opacity-90">
+  //                       {availability.message}
+  //                     </p>
+  //                   </div>
+  //                 </div>
+  //               )
+  //             )}
+
+  //             <button
+  //               type="submit"
+  //               disabled={loading || checkingAvailability}
+  //               className="w-full py-5 bg-brand-navy hover:bg-brand-navy/90 text-white rounded-2xl font-black text-lg transition-all hover:shadow-2xl hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 flex items-center justify-center gap-3"
+  //             >
+  //               {loading ? (
+  //                 <>
+  //                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+  //                   Processing...
+  //                 </>
+  //               ) : (
+  //                 <>
+  //                   {availability?.isAvailable
+  //                     ? "Claim Exclusive Markets"
+  //                     : "Secure Waitlist Spot"}
+  //                   <ChevronRight size={20} />
+  //                 </>
+  //               )}
+  //             </button>
+  //           </form>
+  //         )}
+  //       </div>
+  //     </div>
+  //   </div>
+  // );
 }

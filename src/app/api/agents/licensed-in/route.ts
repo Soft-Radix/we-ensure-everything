@@ -10,6 +10,7 @@ export async function POST(req: NextRequest) {
       email,
       phone,
       selectedCounties,
+      selectedCategory,
       district,
       selectedProducts,
       streetAddress,
@@ -47,6 +48,31 @@ export async function POST(req: NextRequest) {
           { status: 400 },
         );
       }
+      // Helper for GHL Webhook
+      const sendToGHL = async () => {
+        const ghlWebhookUrl = process.env.GHL_AGENT_RESIGTER_WEBHOOK;
+        if (!ghlWebhookUrl) return;
+
+        const payload: any = {
+          name: fullName,
+          email: email || null,
+          phone: phone || null,
+          state: state,
+          county: selectedCounties,
+          category: selectedCategory,
+        };
+
+        try {
+          await fetch(ghlWebhookUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          console.log("✅ GHL Webhook triggered successfully!", payload);
+        } catch (err) {
+          console.error("❌ GHL Webhook failed:", err);
+        }
+      };
 
       // 1. Create agent
       const agent = await Agent.create(
@@ -67,12 +93,29 @@ export async function POST(req: NextRequest) {
         { transaction: t },
       );
 
-      // 2. Fetch all selected products to get their category IDs
-      const products = await Product.findAll({
-        where: { code: selectedProducts },
-        include: [{ model: Category, attributes: ["id", "code"] }],
-        transaction: t,
-      });
+      // 2. Fetch products
+      let products: Product[] = [];
+      if (selectedProducts && selectedProducts.length > 0) {
+        // Fetch specific products
+        products = await Product.findAll({
+          where: { code: selectedProducts },
+          include: [{ model: Category, attributes: ["id", "code"] }],
+          transaction: t,
+        });
+      } else if (selectedCategory) {
+        // Fetch all products for the single selected category
+        const category = await Category.findOne({
+          where: { code: selectedCategory },
+          transaction: t,
+        });
+        if (category) {
+          products = await Product.findAll({
+            where: { category_id: category.id },
+            include: [{ model: Category, attributes: ["id", "code"] }],
+            transaction: t,
+          });
+        }
+      }
 
       // 3. For each county and each product, record in licensed_in table
       const licensedRecords = [];
@@ -93,6 +136,8 @@ export async function POST(req: NextRequest) {
       }
 
       await t.commit();
+      // Trigger GHL Webhook with Agent
+      await sendToGHL();
 
       return NextResponse.json({
         success: true,

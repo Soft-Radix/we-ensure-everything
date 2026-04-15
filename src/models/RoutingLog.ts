@@ -10,6 +10,7 @@ export interface RoutingLogAttributes {
   status: "success" | "failure" | "retry";
   latency_ms?: number;
   error_msg?: string | null;
+  created_at?: Date;
 }
 
 export interface RoutingLogCreationAttributes extends Optional<

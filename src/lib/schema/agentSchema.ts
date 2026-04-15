@@ -9,19 +9,10 @@ export const step1Schema = Yup.object().shape({
   phone: Yup.string()
     .required("Phone is required")
     .matches(/^[0-9]{10}$/, "Phone number must be 10 digits"),
-  selectedStates: Yup.array()
-    .min(1, "Select at least one state")
-    .required("Required"),
-  selectedCounties: Yup.array()
-    .min(1, "Select at least one county")
-    .required("Required"),
+  selectedState: Yup.string().required("Required"),
+  selectedCounty: Yup.string().required("Required"),
   district: Yup.string().optional(),
-  selectedCategories: Yup.array()
-    .min(1, "Select at least one coverage type")
-    .required("Required"),
-  selectedProducts: Yup.array()
-    .min(1, "Select at least one product")
-    .required("Required"),
+  selectedCategory: Yup.string().required("Required"),
 });
 
 export const step2Schema = Yup.object().shape({
