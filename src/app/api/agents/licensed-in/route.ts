@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sequelize, Agent, Category, Product, Licensed } from "@/models";
 import { Op } from "sequelize";
+import { subAccountURL, subAccountVersion } from "@/lib/data/static";
 
 export async function POST(req: NextRequest) {
   try {
@@ -73,6 +74,38 @@ export async function POST(req: NextRequest) {
           console.error("❌ GHL Webhook failed:", err);
         }
       };
+      // Create Sub Account
+      const createSubAccount = async () => {
+        const ghlWebhookUrl = subAccountURL;
+        if (!ghlWebhookUrl) return null;
+
+        const payload: any = {
+          name: fullName,
+          email: email || null,
+          phone: phone || null,
+          companyId: process.env.GHL_COMPANY_ID,
+          address: streetAddress,
+          snapshotId: process.env.GHL_SNAPSHOT_ID,
+        };
+
+        try {
+          const res = await fetch(ghlWebhookUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${process.env.GHL_AGENT_SUBACCOUNT_TOKEN}`,
+              version: subAccountVersion,
+            },
+            body: JSON.stringify(payload),
+          });
+          const data = await res.json();
+          console.log("✅ GHL Sub Account triggered successfully!", data);
+          return data;
+        } catch (err) {
+          console.error("❌ GHL Sub Account failed:", err);
+          return null;
+        }
+      };
 
       // 1. Create agent
       const agent = await Agent.create(
@@ -138,10 +171,13 @@ export async function POST(req: NextRequest) {
       await t.commit();
       // Trigger GHL Webhook with Agent
       await sendToGHL();
+      // Trigger GHL Sub Account
+      const subAccount = await createSubAccount();
 
       return NextResponse.json({
         success: true,
         agentId: agent.id,
+        locationId: subAccount?.id || subAccount?.locationId || null,
         message: "Agent licensing information recorded successfully",
       });
     } catch (err: unknown) {
