@@ -28,6 +28,7 @@
     "react-hot-toast": "^2.6.0",
     "sequelize": "^6.37.8",
     "sequelize-cli": "^6.6.5",
+    "stripe": "^22.0.2",
     "uuid": "^13.0.0",
     "yup": "^1.7.1"
   },
