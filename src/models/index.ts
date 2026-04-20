@@ -11,6 +11,8 @@ import RoutingLog from "./RoutingLog";
 import User from "./User";
 import Licensed from "./Licensed";
 import Payment from "./Payment";
+import WebhookLog from "./WebhookLog";
+
 
 const models = {
   Agent,
@@ -25,7 +27,9 @@ const models = {
   User,
   Licensed,
   Payment,
+  WebhookLog,
 };
+
 
 // If there are any additional associations that need to be defined in a specific order, do it here.
 
@@ -43,6 +47,8 @@ export {
   User,
   Licensed,
   Payment,
+  WebhookLog,
 };
+
 
 export default models;
