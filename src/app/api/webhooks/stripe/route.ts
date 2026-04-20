@@ -5,10 +5,9 @@ import Agent from "@/models/Agent";
 import Payment from "@/models/Payment";
 import { PlanType } from "@/lib/enum";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
 // ⚠️ Must use raw body — NOT req.json()
 export async function POST(req: NextRequest) {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
   const rawBody = await req.text(); // <-- raw, not parsed
   const sig = req.headers.get("stripe-signature");
 
