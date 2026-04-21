@@ -55,3 +55,15 @@ export const onboardingSchema = Yup.object().shape({
     otherwise: (schema) => schema.optional(),
   }),
 });
+
+export const addKeySchema = Yup.object().shape({
+  email: Yup.string()
+    .email("Invalid email address")
+    .required("Email is required"),
+  apiKey: Yup.string()
+    .min(10, "API Key is too short")
+    .required("API Key is required"),
+  // confirmApiKey: Yup.string()
+  //   .oneOf([Yup.ref("apiKey")], "API Keys must match")
+  //   .required("Please confirm your API Key"),
+});

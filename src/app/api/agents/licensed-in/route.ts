@@ -173,11 +173,16 @@ export async function POST(req: NextRequest) {
       await sendToGHL();
       // Trigger GHL Sub Account
       const subAccount = await createSubAccount();
+      const locationId = subAccount?.id || subAccount?.locationId;
+
+      if (locationId) {
+        await agent.update({ ghl_location_id: locationId });
+      }
 
       return NextResponse.json({
         success: true,
         agentId: agent.id,
-        locationId: subAccount?.id || subAccount?.locationId || null,
+        locationId: locationId || null,
         message: "Agent licensing information recorded successfully",
       });
     } catch (err: unknown) {

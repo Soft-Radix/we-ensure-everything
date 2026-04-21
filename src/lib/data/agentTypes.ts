@@ -45,3 +45,12 @@ export interface SingleSelectProps {
   error?: string;
   placeholder?: string;
 }
+export interface MaskedInputProps {
+  name: string;
+  value: string;
+  onChange: (name: string, value: string) => void;
+  onBlur: (e: any) => void;
+  placeholder?: string;
+  error?: boolean;
+  className?: string;
+}
