@@ -10,6 +10,7 @@ import {
   Seat,
   Agent,
 } from "@/models";
+import { subAccountVersion } from "@/lib/data/static";
 
 /* ──────────────────────────────────────────────────────────────
    POST /api/route
@@ -175,6 +176,46 @@ export async function POST(req: NextRequest) {
     // ── 6a. AGENT FOUND → assign ───────────────────────────────
     if (seat && (seat as any).Agent) {
       const agent = (seat as any).Agent as Agent;
+      const createContact = async () => {
+        console.log("🔵 createContact function started");
+        const ghlContactUrl = process.env.GHL_CONTACT_WEBHOOK;
+        if (!ghlContactUrl) {
+          console.error(
+            "❌ GHL_CONTACT_WEBHOOK environment variable is missing!",
+          );
+          return;
+        }
+
+        const payload: any = {
+          firstName: firstName || "",
+          lastName: lastName || "",
+          email: email || null,
+          phone: phone || null,
+          locationId: agent.ghl_location_id,
+          source: "API",
+          tags: [
+            `county_${county.name}`,
+            `category_${categoryName}`,
+            `product_${productName}`,
+          ],
+        };
+        console.log("✅ GHL Contact payload:", payload);
+
+        try {
+          await fetch(ghlContactUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${agent.ghl_api_key}`,
+              version: subAccountVersion,
+            },
+            body: JSON.stringify(payload),
+          });
+          console.log("✅ GHL Contact triggered successfully!", payload);
+        } catch (err) {
+          console.error("❌ GHL Contact failed:", err);
+        }
+      };
 
       await Lead.create({
         id: leadId,
@@ -207,6 +248,8 @@ export async function POST(req: NextRequest) {
 
       // Trigger GHL Webhook with Agent
       await sendToGHL(agent);
+      console.log("🔵 Calling createContact()...");
+      await createContact();
 
       return NextResponse.json({
         status: "assigned",
@@ -226,6 +269,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ── 6b. NO AGENT → log and return no-agent state ───────────
+    console.log("🟠 No agent found for this route.");
     await Lead.create({
       id: leadId,
       county_id: countyId,

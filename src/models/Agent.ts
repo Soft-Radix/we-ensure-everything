@@ -5,6 +5,7 @@ import { PlanType } from "../lib/enum";
 export interface AgentAttributes {
   id: number;
   ghl_user_id?: string | null;
+  ghl_api_key?: string | null;
   full_name: string;
   email: string;
   phone: string;
@@ -22,6 +23,7 @@ export interface AgentAttributes {
   photo_url?: string | null;
   website_url?: string | null;
   plan_type?: PlanType | null;
+  ghl_location_id?: string | null;
   status: "active" | "inactive" | "suspended";
   created_at?: Date;
   updated_at?: Date;
@@ -38,6 +40,7 @@ class Agent
 {
   public id!: number;
   public ghl_user_id?: string | null;
+  public ghl_api_key?: string | null;
   public full_name!: string;
   public email!: string;
   public phone!: string;
@@ -55,6 +58,7 @@ class Agent
   public photo_url?: string | null;
   public website_url?: string | null;
   public plan_type?: PlanType | null;
+  public ghl_location_id?: string | null;
   public status!: "active" | "inactive" | "suspended";
 
   public readonly created_at!: Date;
@@ -72,6 +76,10 @@ Agent.init(
       type: DataTypes.STRING(100),
       allowNull: true,
       unique: true,
+    },
+    ghl_api_key: {
+      type: DataTypes.TEXT,
+      allowNull: true,
     },
     full_name: {
       type: DataTypes.STRING(255),
@@ -145,6 +153,11 @@ Agent.init(
     plan_type: {
       type: DataTypes.ENUM(...Object.values(PlanType)),
       allowNull: true,
+    },
+    ghl_location_id: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      unique: true,
     },
     status: {
       type: DataTypes.ENUM("active", "inactive", "suspended"),
