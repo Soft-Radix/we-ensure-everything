@@ -214,7 +214,9 @@ export async function POST(req: NextRequest) {
       });
       // Trigger GHL Sub Account
       const subAccount = await createSubAccount();
-      const locationId = subAccount?.id || subAccount?.locationId;
+      const locationId =
+        subAccount?.subAccountData?.id ||
+        subAccount?.subAccountData?.locationId;
 
       return NextResponse.json({
         success: true,
