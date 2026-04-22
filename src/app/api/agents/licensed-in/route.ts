@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sequelize, Agent, Category, Product, Licensed } from "@/models";
 import { Op } from "sequelize";
-import { subAccountURL, subAccountVersion } from "@/lib/data/static";
+import {
+  subAccountAdminEndpoint,
+  subAccountURL,
+  subAccountVersion,
+} from "@/lib/data/static";
+import { sendGHLWebhook } from "@/lib/ghl-webhook";
 
 export async function POST(req: NextRequest) {
   try {
@@ -49,31 +54,6 @@ export async function POST(req: NextRequest) {
           { status: 400 },
         );
       }
-      // Helper for GHL Webhook
-      const sendToGHL = async () => {
-        const ghlWebhookUrl = process.env.GHL_AGENT_RESIGTER_WEBHOOK;
-        if (!ghlWebhookUrl) return;
-
-        const payload: any = {
-          name: fullName,
-          email: email || null,
-          phone: phone || null,
-          state: state,
-          county: selectedCounties,
-          category: selectedCategory,
-        };
-
-        try {
-          await fetch(ghlWebhookUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          });
-          console.log("✅ GHL Webhook triggered successfully!", payload);
-        } catch (err) {
-          console.error("❌ GHL Webhook failed:", err);
-        }
-      };
       // Create Sub Account
       const createSubAccount = async () => {
         const ghlWebhookUrl = subAccountURL;
@@ -98,9 +78,63 @@ export async function POST(req: NextRequest) {
             },
             body: JSON.stringify(payload),
           });
-          const data = await res.json();
-          console.log("✅ GHL Sub Account triggered successfully!", data);
-          return data;
+          if (!res.ok) {
+            throw new Error(
+              `Sub account creation failed with status: ${res.status}`,
+            );
+          }
+          const subAccountData = await res.json();
+
+          console.log(
+            "✅ GHL Sub Account triggered successfully!",
+            subAccountData,
+          );
+          const locationId = subAccountData?.id ?? subAccountData?.locationId;
+          if (locationId) {
+            await agent.update({ ghl_location_id: locationId });
+          }
+          if (!locationId) {
+            throw new Error(
+              "❌ No location ID returned from sub account creation",
+            );
+          }
+          const nameParts = fullName.trim().split(" ").filter(Boolean);
+          const firstName = nameParts[0] || "";
+          const lastName =
+            nameParts.length > 1 ? nameParts.slice(1).join(" ") : firstName;
+          const userRes = await fetch(subAccountAdminEndpoint, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${process.env.GHL_AGENT_SUBACCOUNT_TOKEN}`,
+              Version: subAccountVersion,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              firstName,
+              lastName,
+              email: email,
+              password: "StrongPassword@123",
+              type: "account",
+              role: "admin",
+              companyId: process.env.GHL_COMPANY_ID,
+              locationIds: [locationId],
+            }),
+          });
+          if (!userRes.ok) {
+            const errorBody = await userRes.json().catch(() => userRes.text());
+            console.error(
+              "❌ GHL User creation error body:",
+              JSON.stringify(errorBody, null, 2),
+            );
+            throw new Error(
+              `User creation failed with status: ${userRes.status}`,
+            );
+          }
+
+          const userData = await userRes.json();
+          console.log("✅ GHL User created successfully!", userData);
+
+          return { subAccountData, userData };
         } catch (err) {
           console.error("❌ GHL Sub Account failed:", err);
           return null;
@@ -170,14 +204,17 @@ export async function POST(req: NextRequest) {
 
       await t.commit();
       // Trigger GHL Webhook with Agent
-      await sendToGHL();
+      await sendGHLWebhook("agent_created", {
+        name: fullName,
+        email: email || null,
+        phone: phone || null,
+        state: state,
+        county: selectedCounties,
+        category: selectedCategory,
+      });
       // Trigger GHL Sub Account
       const subAccount = await createSubAccount();
       const locationId = subAccount?.id || subAccount?.locationId;
-
-      if (locationId) {
-        await agent.update({ ghl_location_id: locationId });
-      }
 
       return NextResponse.json({
         success: true,
