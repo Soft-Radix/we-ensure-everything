@@ -96,6 +96,14 @@ export async function POST(req: NextRequest) {
             { transaction: t },
           );
 
+          // Send GHL Webhook
+          await sendGHLWebhook("paid", {
+            name: agent.full_name,
+            email: agent.email,
+            phone: agent.phone,
+            state: agent.state,
+          });
+
           await Payment.create(
             {
               agent_id: agent.id,
@@ -138,6 +146,13 @@ export async function POST(req: NextRequest) {
                 },
                 { transaction: t },
               );
+              // Send GHL Webhook
+              await sendGHLWebhook("onboarded", {
+                name: agent.full_name,
+                email: agent.email,
+                phone: agent.phone,
+                state: agent.state,
+              });
             } else if (existingSeat.agent_id !== agent.id) {
               // Add to waitlist if seat is taken by someone else
               const maxPos =
@@ -162,19 +177,18 @@ export async function POST(req: NextRequest) {
                 },
                 { transaction: t },
               );
+              // Send GHL Webhook
+              await sendGHLWebhook("scheduled", {
+                name: agent.full_name,
+                email: agent.email,
+                phone: agent.phone,
+                state: agent.state,
+              });
             }
           }
 
           await t.commit();
           await logEntry.update({ status: "processed" });
-
-          // Send GHL Webhook
-          await sendGHLWebhook("paid", {
-            name: agent.full_name,
-            email: agent.email,
-            phone: agent.phone,
-            state: agent.state,
-          });
         } catch (error) {
           await t.rollback();
           throw error;
