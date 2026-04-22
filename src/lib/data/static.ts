@@ -105,3 +105,7 @@ export const demoPage =
   "https://offers.agentprofl.com/registration-calendar-page";
 export const subAccountURL = "https://services.leadconnectorhq.com/locations/";
 export const subAccountVersion = "2021-07-28";
+export const subAccountAdminEndpoint =
+  "https://services.leadconnectorhq.com/users/";
+export const createOpportunitiesUrl =
+  "https://services.leadconnectorhq.com/opportunities/";

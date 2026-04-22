@@ -10,7 +10,8 @@ import {
   Seat,
   Agent,
 } from "@/models";
-import { subAccountVersion } from "@/lib/data/static";
+import { createOpportunitiesUrl, subAccountVersion } from "@/lib/data/static";
+import { decrypt } from "@/lib/crypto";
 
 /* ──────────────────────────────────────────────────────────────
    POST /api/route
@@ -176,6 +177,17 @@ export async function POST(req: NextRequest) {
     // ── 6a. AGENT FOUND → assign ───────────────────────────────
     if (seat && (seat as any).Agent) {
       const agent = (seat as any).Agent as Agent;
+
+      // Decrypt GHL API Key
+      let ghlApiKey = "";
+      if (agent.ghl_api_key) {
+        try {
+          ghlApiKey = decrypt(agent.ghl_api_key);
+        } catch (err) {
+          console.error("❌ Failed to decrypt GHL API Key:", err);
+        }
+      }
+
       const createContact = async () => {
         console.log("🔵 createContact function started");
         const ghlContactUrl = process.env.GHL_CONTACT_WEBHOOK;
@@ -183,7 +195,7 @@ export async function POST(req: NextRequest) {
           console.error(
             "❌ GHL_CONTACT_WEBHOOK environment variable is missing!",
           );
-          return;
+          return null;
         }
 
         const payload: any = {
@@ -202,20 +214,77 @@ export async function POST(req: NextRequest) {
         console.log("✅ GHL Contact payload:", payload);
 
         try {
-          await fetch(ghlContactUrl, {
+          const response = await fetch(ghlContactUrl, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${agent.ghl_api_key}`,
+              Authorization: `Bearer ${ghlApiKey}`,
               version: subAccountVersion,
             },
             body: JSON.stringify(payload),
           });
-          console.log("✅ GHL Contact triggered successfully!", payload);
+          const data = await response.json();
+          console.log("✅ GHL Contact triggered successfully!", data);
+          return data;
         } catch (err) {
           console.error("❌ GHL Contact failed:", err);
+          return null;
         }
       };
+
+      // Call createContact first to get the contact ID
+      const createContactData = await createContact();
+      const contactId = createContactData?.contact?.id;
+
+      // Pipeline details
+      const pipelineDetails = async () =>
+        fetch(
+          `https://services.leadconnectorhq.com/opportunities/pipelines?locationId=${agent.ghl_location_id}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${ghlApiKey}`,
+              version: subAccountVersion,
+            },
+          },
+        );
+
+      const pipelineDetailsRes = await pipelineDetails();
+      const pipelineDetailsData = await pipelineDetailsRes.json();
+      console.log("✅ Pipeline details:", pipelineDetailsData);
+
+      const pipelineId = pipelineDetailsData?.pipelines?.[0]?.id;
+      const pipleLineStageID =
+        pipelineDetailsData?.pipelines?.[0]?.stages?.[0]?.id;
+
+      if (contactId && pipelineId) {
+        const createOpportunities = async () =>
+          fetch(createOpportunitiesUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${ghlApiKey}`,
+              version: subAccountVersion,
+            },
+            body: JSON.stringify({
+              name: `${firstName} ${lastName}`,
+              locationId: agent.ghl_location_id,
+              contactId: contactId,
+              pipelineId: pipelineId,
+              pipelineStageId: pipleLineStageID,
+              status: "open",
+            }),
+          });
+        const createOpportunitiesRes = await createOpportunities();
+        const createOpportunitiesData = await createOpportunitiesRes.json();
+        console.log("✅ Create opportunities:", createOpportunitiesData);
+      } else {
+        console.warn(
+          "⚠️ Skipping opportunity creation: contactId or pipelineId missing",
+          { contactId, pipelineId },
+        );
+      }
 
       await Lead.create({
         id: leadId,
@@ -248,8 +317,6 @@ export async function POST(req: NextRequest) {
 
       // Trigger GHL Webhook with Agent
       await sendToGHL(agent);
-      console.log("🔵 Calling createContact()...");
-      await createContact();
 
       return NextResponse.json({
         status: "assigned",

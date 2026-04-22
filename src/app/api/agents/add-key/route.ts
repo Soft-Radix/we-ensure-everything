@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Agent from "@/models/Agent";
 import { encrypt } from "@/lib/crypto";
 import { subAccountVersion } from "@/lib/data/static";
+import { sendGHLWebhook } from "@/lib/ghl-webhook";
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,7 +24,9 @@ export async function POST(req: NextRequest) {
         { status: 404 },
       );
     }
-    const locationURL = process.env.GHL_LOCATION_WEBHOOK;
+    const locationURL = `${
+      process.env.GHL_LOCATION_WEBHOOK
+    }${agent?.ghl_location_id?.trim()}`;
     if (!locationURL) {
       return NextResponse.json(
         { error: "Location URL not found" },
@@ -59,6 +62,14 @@ export async function POST(req: NextRequest) {
     // Update agent's API key
     await agent.update({
       ghl_api_key: encryptedKey,
+    });
+
+    // Send GHL Webhook
+    await sendGHLWebhook("api_key_added", {
+      name: agent.full_name,
+      email: agent.email,
+      phone: agent.phone,
+      state: agent.state,
     });
 
     return NextResponse.json({
