@@ -1,4 +1,9 @@
-export type GHLEvent = "agent_created" | "api_key_added" | "paid";
+export type GHLEvent =
+  | "agent_created"
+  | "api_key_added"
+  | "paid"
+  | "onboarded"
+  | "scheduled";
 
 interface GHLData {
   name: string;
