@@ -16,7 +16,7 @@ const ENABLED_SEEDERS = [
   "20260325163000-seed-agents.js",
   "20260325164000-seed-demo-agents.js",
   "20260325170000-seed-seats.js",
-  "20260401183000-replace-agents-and-seats.js",
+  // "20260401183000-replace-agents-and-seats.js",
   "20260402072949-seed-admin-user.js",
 ];
 
