@@ -89,6 +89,13 @@ async function createGHLSubAccount(agent: any) {
     const userData = await userRes.json();
     console.log("✅ GHL User created successfully!", userData);
 
+    const agentUpdates: any = {};
+    if (userData?.id) agentUpdates.ghl_user_id = userData.id;
+
+    if (Object.keys(agentUpdates).length > 0) {
+      await agent.update(agentUpdates);
+    }
+
     return { subAccountData, userData };
   } catch (err) {
     console.error("❌ GHL Sub Account failed:", err);
@@ -207,6 +214,9 @@ export async function POST(req: NextRequest) {
             transaction: t,
           });
 
+          let onboardedTriggered = false;
+          let scheduledTriggered = false;
+
           for (const territory of licensedTerritories) {
             const existingSeat = await Seat.findOne({
               where: {
@@ -230,13 +240,7 @@ export async function POST(req: NextRequest) {
                 },
                 { transaction: t },
               );
-              // Send GHL Webhook
-              await sendGHLWebhook("onboarded", {
-                name: agent.full_name,
-                email: agent.email,
-                phone: agent.phone,
-                state: agent.state,
-              });
+              onboardedTriggered = true;
             } else if (existingSeat.agent_id !== agent.id) {
               // Add to waitlist if seat is taken by someone else
               const maxPos =
@@ -261,14 +265,26 @@ export async function POST(req: NextRequest) {
                 },
                 { transaction: t },
               );
-              // Send GHL Webhook
-              await sendGHLWebhook("scheduled", {
-                name: agent.full_name,
-                email: agent.email,
-                phone: agent.phone,
-                state: agent.state,
-              });
+              scheduledTriggered = true;
             }
+          }
+
+          // Send GHL Webhooks: Prioritize "onboarded" if seats were assigned,
+          // otherwise send "scheduled" if they went to the waitlist.
+          if (onboardedTriggered) {
+            await sendGHLWebhook("api_key_added", {
+              name: agent.full_name,
+              email: agent.email,
+              phone: agent.phone,
+              state: agent.state,
+            });
+          } else if (scheduledTriggered) {
+            await sendGHLWebhook("scheduled", {
+              name: agent.full_name,
+              email: agent.email,
+              phone: agent.phone,
+              state: agent.state,
+            });
           }
 
           await t.commit();
@@ -279,7 +295,7 @@ export async function POST(req: NextRequest) {
             await createGHLSubAccount(agent);
           } catch (ghlError) {
             console.error("Error creating GHL sub-account:", ghlError);
-            // We don't want to fail the whole webhook if GHL sub-account fails, 
+            // We don't want to fail the whole webhook if GHL sub-account fails,
             // but we should log it.
           }
         } catch (error) {

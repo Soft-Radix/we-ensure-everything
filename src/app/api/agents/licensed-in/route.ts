@@ -121,6 +121,12 @@ export async function POST(req: NextRequest) {
         county: selectedCounties,
         category: selectedCategory,
       });
+      console.log(
+        "✅ GHL Webhook triggered successfully! for agent created",
+        fullName,
+        email,
+        phone,
+      );
       return NextResponse.json({
         success: true,
         agentId: agent.id,

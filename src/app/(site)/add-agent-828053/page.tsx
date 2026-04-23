@@ -98,7 +98,6 @@ export default function AddAgentPage() {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
-                planType: "agent_pro",
                 selectedStates: [values.selectedState],
                 selectedCounties: [values.selectedCounty],
                 selectedCategories: selectedCategoryObj

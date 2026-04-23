@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Send GHL Webhook
-    await sendGHLWebhook("api_key_added", {
+    await sendGHLWebhook("onboarded", {
       name: agent.full_name,
       email: agent.email,
       phone: agent.phone,
