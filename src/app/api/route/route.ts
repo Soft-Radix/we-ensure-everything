@@ -176,7 +176,7 @@ export async function POST(req: NextRequest) {
     };
 
     // ── 6a. AGENT FOUND → assign ───────────────────────────────
-    if (seat && (seat as any).Agent) {
+    if (seat && (seat as any).Agent && (seat as any).Agent.ghl_api_key) {
       const agent = (seat as any).Agent as Agent;
 
       // Decrypt GHL API Key
