@@ -101,6 +101,7 @@ export const currentStepInfo = (step: number) => {
 };
 export const adminRoute = "/admin";
 export const paymentPage = "https://offers.agentprofl.com/agentproplus";
+export const paymentDEVPage = "https://offers.agentprofl.com/agentproplus-1410";
 export const demoPage =
   "https://offers.agentprofl.com/registration-calendar-page";
 export const subAccountURL = "https://services.leadconnectorhq.com/locations/";
