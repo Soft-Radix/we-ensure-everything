@@ -11,6 +11,90 @@ import {
 } from "@/models";
 import { PlanType } from "@/lib/enum";
 import { sendGHLWebhook } from "@/lib/ghl-webhook";
+import {
+  subAccountAdminEndpoint,
+  subAccountURL,
+  subAccountVersion,
+} from "@/lib/data/static";
+
+async function createGHLSubAccount(agent: any) {
+  const ghlWebhookUrl = subAccountURL;
+  if (!ghlWebhookUrl) return null;
+
+  const payload: any = {
+    name: agent.full_name,
+    email: agent.email || null,
+    phone: agent.phone || null,
+    companyId: process.env.GHL_COMPANY_ID,
+    address: agent.street_address,
+    snapshotId: process.env.GHL_SNAPSHOT_ID,
+  };
+
+  try {
+    const res = await fetch(ghlWebhookUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.GHL_AGENT_SUBACCOUNT_TOKEN}`,
+        version: subAccountVersion,
+      },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      throw new Error(`Sub account creation failed with status: ${res.status}`);
+    }
+    const subAccountData = await res.json();
+
+    console.log("✅ GHL Sub Account triggered successfully!", subAccountData);
+    const locationId = subAccountData?.id ?? subAccountData?.locationId;
+    if (locationId) {
+      await agent.update({ ghl_location_id: locationId });
+    } else {
+      throw new Error("❌ No location ID returned from sub account creation");
+    }
+
+    const nameParts = agent.full_name.trim().split(" ").filter(Boolean);
+    const firstName = nameParts[0] || "";
+    const lastName =
+      nameParts.length > 1 ? nameParts.slice(1).join(" ") : firstName;
+
+    const userRes = await fetch(subAccountAdminEndpoint, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.GHL_AGENT_SUBACCOUNT_TOKEN}`,
+        Version: subAccountVersion,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        firstName,
+        lastName,
+        email: agent.email,
+        password: "StrongPassword@123",
+        type: "account",
+        role: "admin",
+        companyId: process.env.GHL_COMPANY_ID,
+        locationIds: [locationId],
+      }),
+    });
+
+    if (!userRes.ok) {
+      const errorBody = await userRes.json().catch(() => userRes.text());
+      console.error(
+        "❌ GHL User creation error body:",
+        JSON.stringify(errorBody, null, 2),
+      );
+      throw new Error(`User creation failed with status: ${userRes.status}`);
+    }
+
+    const userData = await userRes.json();
+    console.log("✅ GHL User created successfully!", userData);
+
+    return { subAccountData, userData };
+  } catch (err) {
+    console.error("❌ GHL Sub Account failed:", err);
+    return null;
+  }
+}
 
 // ⚠️ Must use raw body — NOT req.json()
 export async function POST(req: NextRequest) {
@@ -189,6 +273,15 @@ export async function POST(req: NextRequest) {
 
           await t.commit();
           await logEntry.update({ status: "processed" });
+
+          // Create GHL Sub Account after successful payment and transaction commit
+          try {
+            await createGHLSubAccount(agent);
+          } catch (ghlError) {
+            console.error("Error creating GHL sub-account:", ghlError);
+            // We don't want to fail the whole webhook if GHL sub-account fails, 
+            // but we should log it.
+          }
         } catch (error) {
           await t.rollback();
           throw error;
