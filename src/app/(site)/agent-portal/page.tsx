@@ -12,7 +12,6 @@ import {
   ArrowRight,
   Plus,
 } from "lucide-react";
-import { paymentPage } from "@/lib/data/static";
 
 export default function AgentPortalPage() {
   return (
@@ -37,8 +36,7 @@ export default function AgentPortalPage() {
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
-                target="_blank"
-                href={paymentPage}
+                href={"/add-agent-828053"}
                 className="group inline-flex items-center gap-2 rounded-full bg-brand-orange px-8 py-4 text-lg font-bold text-white transition-all hover:scale-105 hover:bg-brand-orange/90"
               >
                 Get Started Now
@@ -414,8 +412,7 @@ export default function AgentPortalPage() {
                         </p>
                       </div>
                       <Link
-                        target="_blank"
-                        href={paymentPage}
+                        href={"/add-agent-828053"}
                         className="rounded-full bg-brand-blue px-6 py-3 font-bold text-white transition-all hover:bg-brand-blue-dark"
                       >
                         Select
@@ -444,8 +441,7 @@ export default function AgentPortalPage() {
                         </p>
                       </div>
                       <Link
-                        target="_blank"
-                        href={paymentPage}
+                        href={"/add-agent-828053"}
                         className="rounded-full bg-brand-orange px-6 py-3 font-bold text-white transition-all hover:bg-brand-orange/90 shadow-lg shadow-brand-orange/20"
                       >
                         Select
@@ -484,8 +480,7 @@ export default function AgentPortalPage() {
             Ready to automate your insurance growth?
           </h2>
           <Link
-            target="_blank"
-            href={paymentPage}
+            href={"/add-agent-828053"}
             className="group inline-flex items-center gap-3 rounded-full bg-brand-blue px-10 py-5 text-xl font-bold text-white transition-all hover:scale-105 hover:bg-brand-blue-dark"
           >
             Launch Your AgentPro! System
