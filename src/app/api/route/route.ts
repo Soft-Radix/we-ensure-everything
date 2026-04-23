@@ -152,6 +152,7 @@ export async function POST(req: NextRequest) {
         category: categoryName,
         product: productName,
         referred_by: referredBy || null,
+        assigned_to: agentInfo?.full_name || "",
       };
 
       if (agentInfo) {
