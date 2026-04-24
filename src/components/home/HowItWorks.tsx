@@ -1,15 +1,28 @@
+import Image from "next/image";
 import { steps } from "@/lib/data/static";
 import React from "react";
 
 const HowItWorks = () => {
   return (
-    <section
-      id="how-it-works"
-      className="relative py-24 md:py-32 bg-[url('/images/works.png')] bg-cover bg-center text-white overflow-hidden before:absolute before:inset-0 before:bg-black/50 before:z-0"
-    >
-      <div className="absolute top-1/2 left-0 w-96 h-96 bg-brand-gold/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+    <section id="how-it-works" className="relative py-24 md:py-32 text-white overflow-hidden">
+      {/* Background image — lazy loaded, below the fold */}
+      <Image
+        src="/images/works.png"
+        alt=""
+        fill
+        loading="lazy"
+        className="object-cover object-center"
+        sizes="100vw"
+        quality={75}
+      />
 
-      <div className="max-w-6xl mx-auto px-6 relative z-10">
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-black/50 z-[1]" />
+
+      {/* Decorative glow */}
+      <div className="absolute top-1/2 left-0 w-96 h-96 bg-brand-gold/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 z-[2]" />
+
+      <div className="max-w-6xl mx-auto px-6 relative z-[3]">
         <div className="text-center mb-20">
           <span className="inline-block text-brand-gold font-bold text-sm uppercase tracking-[0.2em] mb-4">
             Our Process

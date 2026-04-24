@@ -8,9 +8,7 @@ import {
   Users,
   MousePointer2,
   Smartphone,
-  LineChart,
   ArrowRight,
-  Plus,
 } from "lucide-react";
 
 export default function AgentPortalPage() {
