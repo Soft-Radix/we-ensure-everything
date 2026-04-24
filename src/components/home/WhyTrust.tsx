@@ -28,9 +28,11 @@ const WhyTrust = () => {
                     <Image
                       src={tp.icon}
                       alt={tp.title}
-                      width={500}
-                      height={500}
-                      className="object-cover rounded-2xl h-[150px] w-[400px]"
+                      width={400}
+                      height={150}
+                      loading="lazy"
+                      sizes="(max-width: 640px) 90vw, 400px"
+                      className="object-cover rounded-2xl h-[150px] w-full"
                     />
                   </span>
                   <h4 className="font-heading font-bold text-brand-navy text-xl">

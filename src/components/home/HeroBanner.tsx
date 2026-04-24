@@ -1,14 +1,31 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Check } from "lucide-react";
 
 const HeroBanner = () => {
   return (
-    <section className="relative overflow-hidden bg-[url('/images/hero.png')] bg-cover bg-center text-white overflow-hidden before:absolute before:inset-0 before:bg-black/40 before:z-0">
-      {/* Background elements */}
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-linear-to-l from-brand-gold/10 to-transparent pointer-events-none transform-gpu" />
-      <div className="absolute -bottom-48 -left-48 w-96 h-96 rounded-full bg-brand-gold/5 blur-3xl pointer-events-none transform-gpu" />
+    <section className="relative overflow-hidden text-white">
+      {/* ── LCP IMAGE — priority preloads this above the fold ── */}
+      <Image
+        src="/images/hero.png"
+        alt="Insurance agents helping customers across the U.S."
+        fill
+        priority
+        fetchPriority="high"
+        className="object-cover object-center"
+        sizes="100vw"
+        quality={85}
+      />
 
-      <div className="relative max-w-6xl mx-auto px-6 py-28 md:py-40">
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-black/40 z-[1]" />
+
+      {/* Decorative gradients */}
+      <div className="absolute top-0 right-0 w-1/2 h-full bg-linear-to-l from-brand-gold/10 to-transparent pointer-events-none z-[2] transform-gpu" />
+      <div className="absolute -bottom-48 -left-48 w-96 h-96 rounded-full bg-brand-gold/5 blur-3xl pointer-events-none z-[2] transform-gpu" />
+
+      {/* Content */}
+      <div className="relative z-[3] max-w-6xl mx-auto px-6 py-28 md:py-40">
         <div className="max-w-4xl">
           <div className="inline-flex items-center gap-3 bg-white/5 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10 mb-8">
             <span className="flex h-2 w-2 relative">
@@ -29,7 +46,7 @@ const HeroBanner = () => {
             Anywhere in the U.S.
           </h1>
 
-          <p className="text-xl  text-white leading-relaxed mb-8 max-w-2xl font-normal">
+          <p className="text-xl text-white leading-relaxed mb-8 max-w-2xl font-normal">
             Connect with our licensed, vetted insurance agents based on your
             location, needs, and coverage type so you get the right policy, not
             just a quote.
