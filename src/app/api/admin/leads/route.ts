@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
         { model: County, attributes: ["name", "state_abbr"] },
         { model: Category, attributes: ["name"] },
         { model: Product, attributes: ["name"] },
-        { model: Agent, attributes: ["full_name"] },
+        { model: Agent, attributes: ["full_name", "email", "phone"] },
       ],
     });
 

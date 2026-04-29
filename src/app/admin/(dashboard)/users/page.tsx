@@ -27,7 +27,7 @@ interface Lead {
   County?: { name: string; state_abbr: string };
   Category?: { name: string };
   Product?: { name: string };
-  Agent?: { full_name: string };
+  Agent?: { full_name: string; email: string; phone: string };
 }
 
 export default function UsersPage() {
@@ -140,6 +140,9 @@ export default function UsersPage() {
                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
                   ROUTING STATUS
                 </th>
+                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                  ASSIGNED TO
+                </th>
                 <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 text-right">
                   TIMESTAMP
                 </th>
@@ -216,12 +219,31 @@ export default function UsersPage() {
                           <StatusIcon className="w-3.5 h-3.5" />
                           {lead.routing_status.replace("_", " ")}
                         </div>
+                      </td>
+                      <td className="px-8 py-6">
                         {lead.Agent && (
-                          <div className="mt-2 text-[9px] font-bold text-slate-400 uppercase tracking-widest pl-2 border-l border-slate-200 ml-4 italic">
-                            Assigned To:{" "}
-                            <span className="text-brand-navy">
+                          <div className="flex flex-col gap-2 p-4 rounded-2xl border border-brand-gold/30 bg-brand-gold/5 shadow-[0_4px_20px_rgba(255,184,0,0.08)] backdrop-blur-sm max-w-xs">
+                            {/* Name */}
+                            <div className="text-sm font-bold text-slate-800 tracking-wide">
                               {lead.Agent.full_name}
-                            </span>
+                            </div>
+
+                            {/* Divider */}
+                            <div className="h-px bg-brand-gold/20" />
+
+                            {/* Email */}
+                            <div className="flex items-center gap-2 text-xs text-slate-600">
+                              <span>📧</span>
+                              <span className="truncate">
+                                {lead.Agent.email}
+                              </span>
+                            </div>
+
+                            {/* Phone */}
+                            <div className="flex items-center gap-2 text-xs text-slate-600">
+                              <span>📞</span>
+                              <span>{lead.Agent.phone}</span>
+                            </div>
                           </div>
                         )}
                       </td>

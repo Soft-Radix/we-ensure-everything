@@ -36,6 +36,9 @@ class Seat
 
   public readonly created_at!: Date;
   public readonly updated_at!: Date;
+
+  // Associations
+  public readonly Agent?: Agent;
 }
 
 Seat.init(

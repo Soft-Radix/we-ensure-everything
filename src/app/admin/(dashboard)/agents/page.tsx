@@ -14,6 +14,8 @@ import { useLoading } from "@/hooks/useLoading";
 import Pagination from "@/components/admin/Pagination";
 import { SortDirection } from "@/lib/enum";
 import Loader from "@/components/admin/Loader";
+import AssignSeatModal from "@/components/admin/AssignSeatModal";
+import { CheckCircle } from "lucide-react";
 
 interface Agent {
   id: number;
@@ -24,6 +26,7 @@ interface Agent {
   photo_url?: string;
   seat_count: number;
   created_at: string;
+  plan_type: string;
 }
 
 export default function AgentsPage() {
@@ -35,10 +38,13 @@ export default function AgentsPage() {
   const [direction, setDirection] = useState<SortDirection>(SortDirection.ASC);
   const debouncedSearch = useDebounce(search, 500);
 
-  useEffect(() => {
+  const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const fetchAgents = async () => {
     withLoading(async () => {
       const res = await fetch(
-        `/api/agents?page=${page}&limit=10 ${debouncedSearch ? `&search=${debouncedSearch}` : ""} ${direction ? `&direction=${direction}` : ""}`,
+        `/api/agents?page=${page}&limit=10${debouncedSearch ? `&search=${debouncedSearch}` : ""}${direction ? `&direction=${direction}` : ""}`,
       );
       if (res.ok) {
         const data = await res.json();
@@ -46,6 +52,10 @@ export default function AgentsPage() {
         setTotal(data.total);
       }
     });
+  };
+
+  useEffect(() => {
+    fetchAgents();
   }, [page, debouncedSearch, direction]);
 
   return (
@@ -115,6 +125,9 @@ export default function AgentsPage() {
                 </th>
                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
                   STATUS
+                </th>
+                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                  PLAN TYPE
                 </th>
                 <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 text-right">
                   ACTIONS
@@ -200,10 +213,27 @@ export default function AgentsPage() {
                         </span>
                       </div>
                     </td>
+                    <td className="px-8 py-6">
+                      <span className="px-4 w-[100px] text-center block py-1.5 bg-brand-gold/5 text-brand-gold border border-brand-gold/10 rounded-full text-xs font-black shadow-[0_2px_8px_rgba(255,184,0,0.05)]">
+                        {agent.plan_type ?? "N/A"}
+                      </span>
+                    </td>
                     <td className="px-10 py-6 text-right">
-                      <button className="p-2.5 rounded-xl hover:bg-white hover:text-brand-navy hover:shadow-lg transition-all group-active:scale-95 border border-transparent hover:border-slate-100 text-slate-300">
-                        <MoreHorizontal className="w-5 h-5" />
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => {
+                            setSelectedAgent(agent);
+                            setIsModalOpen(true);
+                          }}
+                          className="flex items-center cursor-pointer gap-2 px-4 py-2 rounded-xl bg-brand-gold/10 text-brand-gold hover:bg-brand-gold hover:text-slate-900 transition-all font-bold text-[10px] uppercase tracking-widest border border-brand-gold/20"
+                        >
+                          <CheckCircle className="w-3.5 h-3.5" />
+                          Assign
+                        </button>
+                        {/* <button className="p-2.5 rounded-xl hover:bg-white hover:text-brand-navy hover:shadow-lg transition-all group-active:scale-95 border border-transparent hover:border-slate-100 text-slate-300">
+                          <MoreHorizontal className="w-5 h-5" />
+                        </button> */}
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -222,6 +252,15 @@ export default function AgentsPage() {
           <Pagination page={page} total={total} setPage={setPage} />
         </div>
       </div>
+
+      {selectedAgent && (
+        <AssignSeatModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          agent={selectedAgent}
+          onSuccess={fetchAgents}
+        />
+      )}
     </div>
   );
 }

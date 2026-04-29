@@ -8,5 +8,12 @@ const Toaster = dynamic(
 );
 
 export default function ToasterProvider() {
-  return <Toaster position="top-right" />;
+  return (
+    <Toaster 
+      position="top-right" 
+      containerStyle={{
+        zIndex: 99999,
+      }}
+    />
+  );
 }
