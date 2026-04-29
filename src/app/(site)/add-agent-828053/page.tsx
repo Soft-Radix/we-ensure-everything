@@ -24,12 +24,7 @@ import {
   step2Schema,
   step3Schema,
 } from "@/lib/schema/agentSchema";
-import {
-  currentStepInfo,
-  demoPage,
-  paymentDEVPage,
-  paymentPage,
-} from "@/lib/data/static";
+import { currentStepInfo, demoPage } from "@/lib/data/static";
 import AddAgentHeader from "@/components/agent/AddAgentHeader";
 import toast from "react-hot-toast";
 
