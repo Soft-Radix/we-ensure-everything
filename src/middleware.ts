@@ -16,10 +16,23 @@ export default async function middleware(request: NextRequest) {
   }
 
   // 2. Allow public admin routes (login)
+  // 2. Allow public admin routes (login), but redirect away if already authenticated
   if (
     PUBLIC_ADMIN_ROUTES.some((route) => pathname.startsWith(route)) ||
     pathname === "/api/admin/auth/login"
   ) {
+    const sessionToken = request.cookies.get(COOKIE_NAME)?.value;
+    if (sessionToken) {
+      try {
+        const payload = await decrypt(sessionToken);
+        if (["admin", "superadmin"].includes(payload.role)) {
+          return NextResponse.redirect(new URL("/admin", request.url));
+        }
+      } catch (err) {
+        // Invalid/expired token — let them through to login
+        console.error("[Middleware] JWT Validation Error:", err);
+      }
+    }
     return NextResponse.next();
   }
 
