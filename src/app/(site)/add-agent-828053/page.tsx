@@ -131,13 +131,7 @@ export default function AddAgentPage() {
         setTimer((prev) => prev - 1);
       }, 1000);
     } else if (showStatus && isAvailable && timer === 0) {
-      if (process.env.NODE_ENV !== "development") {
-        const paymentUrl = paymentDEVPage;
-        window.location.href = paymentUrl;
-      } else {
-        const paymentUrl = paymentPage;
-        window.location.href = paymentUrl;
-      }
+      window.location.href = process.env.NEXT_PUBLIC_PAYMENT_PAGE_URL || "";
     }
     return () => clearInterval(interval);
   }, [showStatus, isAvailable, timer]);
