@@ -25,6 +25,8 @@ export async function GET() {
       icon: c.icon,
       description: c.description,
       // @ts-expect-error - products association loaded via include
+      products: c.products || [],
+      // @ts-expect-error - products association loaded via include
       productCount: c.products?.length ?? 0,
     }));
 

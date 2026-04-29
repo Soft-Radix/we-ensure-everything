@@ -101,7 +101,7 @@ const UserDetailsStep = ({
                 <button
                   key={p.code}
                   onClick={() => setSelectedProduct(p)}
-                  className={`px-5 py-3 text-left border-1 rounded-xl text-sm transition-all
+                  className={`px-5 cursor-pointer py-3 text-left border-1 rounded-xl text-sm transition-all
                             ${
                               selectedProduct?.code === p.code
                                 ? "border-brand-gold bg-brand-gold/5 font-bold text-brand-navy shadow-sm"

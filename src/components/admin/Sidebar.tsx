@@ -8,6 +8,7 @@ import {
   Settings,
   LogOut,
   ShieldCheck,
+  Briefcase,
 } from "lucide-react";
 import { useState } from "react";
 import { createPortal } from "react-dom";
@@ -18,6 +19,7 @@ const menuItems = [
   { label: "Dashboard", href: adminRoute, icon: LayoutDashboard },
   { label: "Users (Leads)", href: `${adminRoute}/users`, icon: Users },
   { label: "Agents", href: `${adminRoute}/agents`, icon: UserSquare2 },
+  { label: "Seats", href: `${adminRoute}/seats`, icon: Briefcase },
   //   { label: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
